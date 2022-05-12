@@ -1,0 +1,373 @@
+---
+title: "analysis"
+author: "Mario Mueller"
+date: "5/11/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# SIENA Analysis using R for the Paper Submission to the 
+#   Hawaii International Conference on System Sciences (HICSS) 2022.
+# Written by Mario Mueller <mario.mueller@wiso.uni-koeln.de>
+##############################################
+# Contents:
+#     (1) setup
+#     (2) load & inspect data
+#     (3) prepare objects for RSiena
+#     (4) model specification & estimation
+#     (5) goodness of fit
+#     (6) time heterogeneity
+#     (7) interpretation
+#     (8) simulations
+##############################################
+
+# =======================================
+# (1) setup
+# =======================================
+
+# Install the RSiena package
+install.packages("RSiena")
+
+# Load RSiena and sna
+library(RSiena)
+library(sna)
+
+# Check RSiena version. The initial analysis run with version 1.2.23
+packageVersion("RSiena")
+
+# Required function for output and GOF analysis
+# Functions are adapted from tutorial for the Social Networks and Health 
+#   workshop at Duke University on May 18, 2018 by David R. Schaefer
+outTable <- function(x) {
+  coef <- abs(x$theta)
+  coefPretty <- sprintf("%.3f", round(coef,3))
+  se <- diag(x$covtheta)**.5
+  sePretty <- sprintf("%.3f", round(se,3))
+  pval <- 2*pnorm(-abs(coef/se))
+  symp <- symnum(pval, corr = FALSE,
+                 cutpoints = c(0,  .001,.01,.05, .1, 1),
+                 symbols = c("***","**","*","."," "))
+  convPretty <- sprintf("%.3f", round(abs(x$tconv),3))
+  out1 <- noquote(cbind(
+    Function = x$effects[[1]], 
+    Effect = x$effects[[2]], 
+    Coef = coefPretty, 
+    StEr = sePretty, 
+    Sig = symp, 
+    Conv = convPretty))
+  out2 <- paste("Maximum Convergence Ratio:", round(x$tconv.max,3))
+  return(list(out1,out2))
+}
+
+# Functions required for GOF tests
+GeodesicDistribution <- function (i, data, sims, period, groupName,
+                                  varName, levls=c(1:5,Inf), cumulative=TRUE, ...) {
+  x <- networkExtraction(i, data, sims, period, groupName, varName)
+  require(sna)
+  a <- sna::geodist(symmetrize(x))$gdist
+  if (cumulative)
+  {
+    gdi <- sapply(levls, function(i){ sum(a<=i) })
+  }
+  else
+  {
+    gdi <- sapply(levls, function(i){ sum(a==i) })
+  }
+  names(gdi) <- as.character(levls)
+  gdi
+}
+
+# Holland and Leinhardt Triad Census; see ?sna::triad.census.
+TriadCensus <- function(i, data, sims, wave, groupName, varName, levls=1:16){
+  unloadNamespace("igraph") # to avoid package clashes
+  require(sna)
+  require(network)
+  x <- networkExtraction(i, data, sims, wave, groupName, varName)
+  if (network.edgecount(x) <= 0){x <- symmetrize(x)}
+  # because else triad.census(x) will lead to an error
+  tc <- sna::triad.census(x)[1,levls]
+  # names are transferred automatically
+  tc
+}
+
+
+# =======================================
+# (2) load & inspect data
+# =======================================
+
+# Set working directory
+setwd('/Users/mariomueller/Workspace/posse/rsiena/')
+
+# Load Data 
+# 
+# Adjacency Matrices of Dependency Network for each Observation
+net1 <- as.matrix(read.table('data/net1.txt'))  # 2016
+net2 <- as.matrix(read.table('data/net2.txt'))  # 2017
+net3 <- as.matrix(read.table('data/net3.txt'))  # 2018
+net4 <- as.matrix(read.table('data/net4.txt'))  # 2019
+
+netList <- list(net1, net2, net3, net4)
+netArray <- array(c(net1, net2, net3, net4), dim=c(dim(net1), length(netList)))
+
+# Adjacency Matrices for Dependency Types for each Observation
+# Note: The last observation is not considered for dyadic covariates
+types1 <- as.matrix(read.table('data/net1-type.txt'))  # 2016
+types2 <- as.matrix(read.table('data/net2-type.txt'))  # 2017
+types3 <- as.matrix(read.table('data/net3-type.txt'))  # 2018
+
+typesList <- list(types1, types2, types3)
+typesArray <- array(c(types1, types2, types3), dim=c(dim(types1),
+                    length(typesList)))
+
+# Behavior Variable: Updates
+updates <- as.matrix(read.table('data/updates-codes.txt'))
+
+# Actor Variables
+releases <- as.matrix(read.table('data/releases-codes.txt'))
+licenses <- as.matrix(read.table('data/licenses-codes.txt'))
+ages <- as.matrix(read.table('data/ages.txt'))
+
+# Inspect Data
+#
+lapply(netList, dim)   # each network has the same number of actors as needed
+lapply(netList, function(x) table(x, useNA='always'))
+
+lapply(typesList, dim)   # each network has the same number of actors as needed
+lapply(typesList, function(x) table(x, useNA='always'))
+
+# Plot Network Changes
+g.layout <- gplot(apply(netArray, c(1,2), max), usearrows=T)
+
+par(mfrow=c(1,4))
+for (i in 1:4) {
+  gplot(netArray[,,i], arrowhead.cex=.75, edge.col='gray70', coord=g.layout, 	
+        vertex.cex=1.5, main=paste('Dependency Network t',i,sep="") )
+}
+
+# =======================================
+# (3) prepare objects for RSiena
+# =======================================
+
+netDep <- sienaDependent(netArray, type="oneMode")
+updDep <- sienaDependent(updates, type="behavior")
+
+typDyad <- varDyadCovar(typesArray)
+
+licVar <- varCovar(licenses)
+relVar <- varCovar(releases)
+ageVar <- varCovar(ages)
+
+changes <- sienaCompositionChangeFromFile('data/composition-changes.txt')
+
+data <- sienaDataCreate(netDep, updDep, typDyad, licVar, relVar, ageVar, changes)
+
+print01Report(data, modelname='hicss-2022')
+
+# =======================================
+# (4) model specification & estimation
+# =======================================
+
+algorithm <- sienaAlgorithmCreate(projname='hicss-2022')
+
+effects <- getEffects(data)
+effectsDocumentation(effects)
+
+ans.model0 <- siena07(algorithm, data=data, effects=effects,
+                      batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                      nbrNodes=4)
+
+#------------------------
+# Endogenous Effects
+#------------------------
+
+# Transitivity
+effects <- includeEffects(effects, transTrip, name="netDep",
+                          test=F, fix=F, include=T)
+# Test interaction between reciprocity and transitivity (Block 2015)
+effects <- includeEffects(effects, transRecTrip, name="netDep",
+                          test=T, fix=T, include=T)
+# Popularity
+effects <- includeEffects(effects, inPop, name="netDep",
+                          test=F, fix=F, include=T)
+effects <- includeEffects(effects, outPop, name="netDep",
+                          test=F, fix=F, include=T)
+# Activity
+effects <- includeEffects(effects, outAct, name="netDep",
+                          test=F, fix=F, include=T)
+# Assortativity
+effects <- includeEffects(effects, outInAss, name="netDep",
+                          test=F, fix=F, include=T)
+
+eff.model0 <- effects
+ans.model0 <- siena07(algorithm, data=data, effects=eff.model0,
+                      batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                      nbrNodes=4)
+
+outTable(ans.model0)
+
+#------------------------
+# Exogenous Effects
+#------------------------
+# Dependency Type
+effects <- includeEffects(effects, WXX, name="netDep", interaction1="typDyad",
+                          test=F, fix=F, include=T)
+# License
+effects <- includeEffects(effects, sameX, egoX, altX,
+                          name="netDep", interaction1="licVar",
+                          test=F, fix=F, include=T)
+# Age
+effects <- includeEffects(effects, simX, egoX, altX,
+                          name="netDep", interaction1="ageVar",
+                          test=F, fix=F, include=T)
+
+eff.model1 <- effects
+ans.model1 <- siena07(algorithm, data=data, effects=eff.model1,
+                      batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                      nbrNodes=4)
+
+outTable(ans.model1)
+
+#------------------------
+# Selection Effects
+#------------------------
+effects <- includeEffects(effects, altX, egoX, simX, name="netDep",
+                          interaction1="updDep", test=F, fix=F, include=T)
+eff.model2 <- effects
+ans.model2 <- siena07(algorithm, data=data, effects=eff.model2,
+                      batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                      nbrNodes=4)
+
+outTable(ans.model2)
+
+#------------------------
+# Influence Effects
+#------------------------
+effects <- includeEffects(effects, outdeg, name="updDep", interaction1="netDep",
+                          test=F, fix=F, include=T)
+effects <- includeEffects(effects, indeg, name="updDep", interaction1="netDep",
+                          test=F, fix=F, include=T)
+effects <- includeEffects(effects, avSim, name="updDep", interaction1="netDep",
+                          test=F, fix=F, include=T)
+
+eff.model3 <- effects
+ans.model3 <- siena07(algorithm, data=data, effects=eff.model3,
+               batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+               nbrNodes=4)
+
+outTable(ans.model3)
+
+# =======================================
+# (5) Goodness-of-Fit Tests
+# =======================================
+
+# GOF for current estimates with comp changes
+( gof.id <- sienaGOF(ans.model3, verbose=TRUE, varName="netDep",
+                     IndegreeDistribution, join=T, cumulative=F) )
+plot(gof.id)
+
+( gof.od <- sienaGOF(ans.model3, verbose=TRUE, varName="netDep",
+                     OutdegreeDistribution, join=T, cumulative=F) )
+plot(gof.od)
+
+( gof.gd <- sienaGOF(ans.model3, verbose=TRUE, varName="netDep",
+                     GeodesicDistribution, join=T, cumulative=F) )
+plot(gof.gd)
+
+( gof.tc <- sienaGOF(ans.model3, verbose=TRUE, varName="netDep",
+                     TriadCensus, join=T) )
+plot(gof.tc, scale=TRUE, center=TRUE)
+
+( gof.bd <- sienaGOF(ans.model3, verbose=TRUE, varName="updDep",
+                     BehaviorDistribution, join=T) )
+plot(gof.bd)
+
+# =======================================
+# (6) Time Heterogeneity
+# =======================================
+
+tt <- sienaTimeTest(ans)
+
+summary(tt)
+plot(tt)
+
+
+# Save Workspace
+save.image("hicss.RData")
+
+
+###############################################################################
+# Create new dataset without joiner and leavers,
+# as advised in Ripley et al. (2021)
+# Adjacency Matrices of Dependency Network for each Observation
+net1GOF <- as.matrix(read.table('data/net1-gof.txt'))  # 2016
+net2GOF <- as.matrix(read.table('data/net2-gof.txt'))  # 2017
+net3GOF <- as.matrix(read.table('data/net3-gof.txt'))  # 2018
+net4GOF <- as.matrix(read.table('data/net4-gof.txt'))  # 2019
+netListGOF <- list(net1GOF, net2GOF, net3GOF, net4GOF)
+netArrayGOF <- array(c(net1GOF, net2GOF, net3GOF, net4GOF),
+                     dim=c(dim(net1GOF), length(netListGOF)))
+
+types1GOF <- as.matrix(read.table('data/net1-type-gof.txt'))  # 2016
+types2GOF <- as.matrix(read.table('data/net2-type-gof.txt'))  # 2017
+types3GOF <- as.matrix(read.table('data/net3-type-gof.txt'))  # 2018
+typesListGOF <- list(types1GOF, types2GOF, types3GOF)
+typesArrayGOF <- array(c(types1GOF, types2GOF, types3GOF),
+                       dim=c(dim(types1GOF), length(typesListGOF)))
+
+netDepGOF <- sienaDependent(netArrayGOF, type="oneMode")
+typDyadGOF <- varDyadCovar(typesArrayGOF)
+
+dataGOF <- sienaDataCreate(netDepGOF, updDep, typDyadGOF, licVar, relVar, ageVar)
+
+print01Report(dataGOF, modelname='hicss-2022-gof')
+
+algorithmGOF <- sienaAlgorithmCreate(projname='hicss-2022-gof')
+
+effectsGOF <- getEffects(dataGOF)
+
+# Add effects of full model
+effectsGOF <- includeEffects(effectsGOF, transTrip, inPop, outPop, outAct, 
+                             name="netDepGOF")
+effectsGOF <- includeEffects(effectsGOF, WXX, interaction1="typDyadGOF",
+                             name="netDepGOF")
+effectsGOF <- includeEffects(effectsGOF, altX, interaction1="updDep",
+                             name="netDepGOF")
+effectsGOF <- includeEffects(effectsGOF, sameX, interaction1="licVar",
+                             name="netDepGOF")
+effectsGOF <- includeEffects(effectsGOF, altX, interaction1="ageVar",
+                             name="netDepGOF")
+effectsGOF <- includeEffects(effectsGOF, simX, interaction1="ageVar",
+                             name="netDepGOF")
+effectsGOF <- includeEffects(effectsGOF, outdeg, interaction1="netDepGOF",
+                             name="updDep")
+
+ans.gof <- siena07(algorithmGOF, data=dataGOF, effects=effectsGOF,
+                   batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                   nbrNodes=4)
+
+( gof.id <- sienaGOF(ans.gof, verbose=TRUE, varName="netDepGOF",
+                     IndegreeDistribution, join=T, cumulative=F) )
+plot(gof.id)
+
+( gof.od <- sienaGOF(ans.gof, verbose=TRUE, varName="netDepGOF",
+                     OutdegreeDistribution, join=T, cumulative=F) )
+plot(gof.od)
+
+( gof.gd <- sienaGOF(ans.gof, verbose=TRUE, varName="netDepGOF",
+                     GeodesicDistribution, join=T, cumulative=F) )
+plot(gof.gd)
+
+( gof.tc <- sienaGOF(ans.gof, verbose=TRUE, varName="netDepGOF",
+                     TriadCensus, join=T) )
+plot(gof.tc, scale=TRUE, center=TRUE)
+
+( gof.bd <- sienaGOF(ans.gof, verbose=TRUE, varName="updDep",
+                     BehaviorDistribution, join=T) )
+plot(gof.bd)
+
+```
+

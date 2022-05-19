@@ -40,7 +40,12 @@ vignettes/*.pdf
 .env
 
 # Data folder
-data/
+data/networks
+data/edgelists
+data/lists
+
+# Tutorial
+tutorial/
 
 # macOS
 .DS_Store

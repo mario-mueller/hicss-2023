@@ -7,7 +7,244 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(tidygraph)
+library(igraph)
+library(Bergm)
+library(network)
+library(sna)
+library(igraph)
+library(intergraph)
+# Sys.setenv('R_MAX_VSIZE'=200000000000)
+setwd("/Users/mariomueller/Workspace/hicss-2023")
 ```
+
+## Dependency Network
+
+```{r}
+nodes <- read_csv("./data/nodelists/packages.csv", col_names = TRUE) %>%
+    rename(label = id) %>%
+    rowid_to_column("id") %>%
+    select(id, label)
+
+edges <- read_csv("./data/edgelists/dependency_network-2021-04-01.edgelist", col_names = c("source", "destination")) %>%
+  left_join(nodes, by = c("source" = "label")) %>%
+  rename(from = id) %>%
+  left_join(nodes, by = c("destination" = "label")) %>%
+  rename(to = id) %>%
+  select(from, to)
+
+dnet1 <- network(edges, directed=TRUE, bipartite=FALSE, vertex.attr = nodes, matrix.type="edgelist")
+```
+
+```{r}
+dnet1 <- read_graph("data/networks/dependency_network-2021-04-01.gml", format = "gml") %>%
+  asNetwork()
+```
+
+
+```{r}
+fit1 <- bergm(dnet1 ~ edges + ikstar(1),
+              burn.in = 50,
+              aux.iters = 500,
+              main.iters = 1000,
+              gamma = 1.2)
+```
+
+
+
+## Affiliation
+
+```{r}
+nodes <- list.files(path="./data/nodelists/", full.names = TRUE) %>% 
+  lapply(read_csv) %>%
+  bind_rows() %>%
+  rename(label = id) %>%
+  rowid_to_column("id") %>%
+  select(id, label) %>%
+  mutate(is_actor = if_else(str_detect(label, "dev_"), 1, 0))
+```
+
+```{r}
+edges <- read_csv("./data/edgelists/affiliation_network-2021-04-01.edgelist", col_names = c("source", "destination")) %>%
+  left_join(nodes, by = c("source" = "label")) %>%
+  rename(from = id) %>%
+  left_join(nodes, by = c("destination" = "label")) %>%
+  rename(to = id) %>%
+  select(from, to)
+```
+
+```{r}
+net1 <- network(edges, directed=FALSE, bipartite=TRUE, bipartite_col="is_actor", vertex.attr = nodes, matrix.type="edgelist")
+```
+
+
+```{r}
+nodes %>%
+  filter(str_detect(label, 'dev_'))
+```
+
+```{r}
+aff1 <- read_graph("data/networks/affiliation_network-2021-04-01.gml", format = "gml") %>%
+  asNetwork()
+aff2 <- read_graph("data/networks/affiliation_network-2021-07-01.gml", format = "gml")
+aff3 <- read_graph("data/networks/affiliation_network-2021-10-01.gml", format = "gml")
+aff4 <- read_graph("data/networks/affiliation_network-2022-01-01.gml", format = "gml")
+```
+
+```{r}
+aff1
+```
+
+```{r}
+make_bipartite_graph(aff1)
+```
+
+
+```{r}
+fit1 <- bergm(net1 ~ edges,
+              burn.in = 50,
+              aux.iters = 500,
+              main.iters = 1000,
+              gamma = 1.2)
+```
+
+# Data
+
+```{r}
+# Read adjacency matrices for dependency networks
+dn1 <- as.matrix(read.table('data/adjacency/dnet2021-04-01.txt'))
+dn2 <- as.matrix(read.table('data/adjacency/dnet2021-07-01.txt'))
+dn3 <- as.matrix(read.table('data/adjacency/dnet2021-10-01.txt'))
+dn4 <- as.matrix(read.table('data/adjacency/dnet2022-01-01.txt'))
+```
+
+```{r}
+library(usethis) 
+usethis::edit_r_environ()
+```
+
+
+# SIENA 2023
+
+```{r}
+library(RSiena)
+library(sna)
+```
+
+```{r}
+# Nodelists
+devs <- read_csv("./data/nodelists/developers.csv", col_names = TRUE)
+pkgs <- read_csv("./data/nodelists/packages.csv", col_names = TRUE)
+```
+
+
+```{r}
+net1 <- as.matrix(read.table('data/adjacency/net-2021-04-01.txt'))
+net2 <- as.matrix(read.table('data/adjacency/net-2021-07-01.txt'))
+net3 <- as.matrix(read.table('data/adjacency/net-2021-10-01.txt'))
+net4 <- as.matrix(read.table('data/adjacency/net-2022-01-01.txt'))
+```
+
+```{r}
+aff1 <- as.matrix(read.table('data/adjacency/anet-2021-02-01.txt'))
+aff2 <- as.matrix(read.table('data/adjacency/anet-2021-03-01.txt'))
+aff3 <- as.matrix(read.table('data/adjacency/anet-2021-04-01.txt'))
+aff4 <- as.matrix(read.table('data/adjacency/anet-2021-05-01.txt'))
+aff5 <- as.matrix(read.table('data/adjacency/anet-2021-06-01.txt'))
+aff6 <- as.matrix(read.table('data/adjacency/anet-2021-07-01.txt'))
+aff7 <- as.matrix(read.table('data/adjacency/anet-2021-08-01.txt'))
+aff8 <- as.matrix(read.table('data/adjacency/anet-2021-09-01.txt'))
+aff9 <- as.matrix(read.table('data/adjacency/anet-2021-10-01.txt'))
+aff10 <- as.matrix(read.table('data/adjacency/anet-2021-11-01.txt'))
+aff11 <- as.matrix(read.table('data/adjacency/anet-2021-12-01.txt'))
+aff12 <- as.matrix(read.table('data/adjacency/anet-2022-01-01.txt'))
+```
+
+
+```{r}
+# Save numbers of developers and packages for network dimensions
+num_devs <- dim(devs)[1]
+num_pkgs <- dim(pkgs)[1]
+```
+
+```{r}
+netList <- list(net1, net2, net3, net4)
+netArray <- array(c(net1, net2, net3, net4), dim=c(num_devs, num_pkgs, length(netList)))
+net <- sienaDependent(netArray, type="bipartite", nodeSet = c("devs", "pkgs"))
+```
+
+```{r}
+netList <- list(aff1, aff2, aff3, aff4, aff5, aff6, aff7, aff8, aff9, aff10, aff11, aff12)
+netArray <- array(c(aff1, aff2, aff3, aff4, aff5, aff6, aff7, aff8, aff9, aff10, aff11, aff12),
+                  dim=c(num_devs, num_pkgs, length(netList)))
+net <- sienaDependent(netArray, type="bipartite", nodeSet = c("devs", "pkgs"))
+```
+
+```{r}
+lapply(netList, dim)   # each network has the same number of actors as needed
+lapply(netList, function(x) table(x, useNA='always'))
+```
+
+```{r}
+devs <- sienaNodeSet(num_devs, nodeSetName = "devs")
+pkgs <- sienaNodeSet(num_pkgs, nodeSetName = "pkgs")
+```
+
+```{r}
+devs.comp <- sienaCompositionChangeFromFile('data/compositions/devs_comp.txt', nodeSet = "devs")
+pkgs.comp <- sienaCompositionChangeFromFile('data/compositions/pkgs_comp.txt', nodeSet = "pkgs")
+```
+
+```{r}
+deps_up <- as.matrix(read.table('data/individual/pkg_upstream.txt'))
+deps_down <- as.matrix(read.table('data/individual/pkg_downstream.txt'))
+```
+
+```{r}
+depsUpVar   <- varCovar(deps_up, nodeSet = "pkgs")
+depsDownVar <- varCovar(deps_down, nodeSet = "pkgs")
+```
+
+```{r}
+data <- sienaDataCreate(net, devs.comp, pkgs.comp, nodeSets = list(devs, pkgs))
+```
+
+
+```{r}
+data <- sienaDataCreate(net, depsUpVar, depsDownVar, nodeSets = list(devs, pkgs))
+```
+
+```{r}
+model <- sienaModelCreate()
+```
+
+```{r}
+print01Report(data, modelname='hicss-2023')
+```
+
+```{r}
+algorithm <- sienaAlgorithmCreate(projname='hicss-2023')
+effects <- getEffects(data)
+effectsDocumentation(effects)
+
+
+ans.model0 <- siena07(algorithm, data=data, effects=effects,
+                      batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                      nbrNodes=4)
+```
+
+```{r}
+effects <- includeEffects(effects, inPop, name="net",
+                          test=F, fix=F, include=T)
+ans.model1 <- siena07(algorithm, data=data, effects=effects,
+                      batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                      nbrNodes=4)
+```
+
+
+
+# HICSS 2022 Script
 
 ```{r}
 # SIENA Analysis using R for the Paper Submission to the 

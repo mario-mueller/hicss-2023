@@ -1062,3 +1062,63 @@ Observed values of target statistics are
 
  5 parameters, 5 statistics
 
+Estimation of derivatives by the LR method (type 1).
+
+
+@2
+End of stochastic approximation algorithm, phase 3.
+---------------------------------------------------
+
+Total of 2158 iterations.
+Parameter estimates based on 1158 iterations,
+convergence diagnostics, covariance and derivative matrices based on 1000 iterations.
+
+Information for convergence diagnosis.
+Averages, standard deviations, and t-ratios for deviations from targets:
+  1. -40.2440   6.4997  -6.1916 
+  2.   0.2680   9.6076   0.0279 
+  3.   0.2350  11.7365   0.0200 
+  4.  -0.2700  12.3807  -0.0218 
+  5. -24.0410  18.6088  -1.2919 
+
+Good convergence is indicated by the t-ratios being close to zero.
+
+Overall maximum convergence ratio =  6.2763 .
+One or more of the t-statistics are rather large.
+Convergence of the algorithm is doubtful.
+
+
+
+@2
+Estimation Results.
+-------------------
+
+Regular end of estimation algorithm.
+Total of 2158 iteration steps.
+
+
+@3
+Estimates and standard errors
+                             
+ 1. rate:  constant net rate (period 1)                           68.0478  (   6.4997)
+ 2. rate:  constant net rate (period 2)                            5.8119  (   1.9281)
+ 3. rate:  constant net rate (period 3)                            2.0605  (   0.2028)
+ 4. rate:  constant net rate (period 4)                            1.4543  (   0.1747)
+ 5. eval:  outdegree (density)                                    -4.2416  (   0.1035)
+
+
+@3
+Covariance matrices
+                   
+Covariance matrix of estimates (correlations below diagonal):
+    42.247     -2.469     -0.097     -0.095      0.181
+    -0.197      3.717     -0.076     -0.075      0.045
+    -0.074     -0.195      0.041     -0.003     -0.003
+    -0.083     -0.221     -0.082      0.031     -0.002
+     0.269      0.225     -0.152     -0.132      0.011
+
+Derivative matrix of expected statistics X by parameters and
+covariance/correlation matrix of X can be found using
+summary(ans) within R, or by using the 'verbose' option in Siena07.
+ 
+Total computation time 470.8 seconds.

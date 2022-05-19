@@ -17,6 +17,64 @@ library(RSiena)
 setwd("/Users/mariomueller/Workspace/hicss-2023")
 ```
 
+# Required Functions
+
+```{r}
+# Required function for output and GOF analysis
+# Functions are adapted from tutorial for the Social Networks and Health 
+#   workshop at Duke University on May 18, 2018 by David R. Schaefer
+outTable <- function(x) {
+  coef <- abs(x$theta)
+  coefPretty <- sprintf("%.3f", round(coef,3))
+  se <- diag(x$covtheta)**.5
+  sePretty <- sprintf("%.3f", round(se,3))
+  pval <- 2*pnorm(-abs(coef/se))
+  symp <- symnum(pval, corr = FALSE,
+                 cutpoints = c(0,  .001,.01,.05, .1, 1),
+                 symbols = c("***","**","*","."," "))
+  convPretty <- sprintf("%.3f", round(abs(x$tconv),3))
+  out1 <- noquote(cbind(
+    Function = x$effects[[1]], 
+    Effect = x$effects[[2]], 
+    Coef = coefPretty, 
+    StEr = sePretty, 
+    Sig = symp, 
+    Conv = convPretty))
+  out2 <- paste("Maximum Convergence Ratio:", round(x$tconv.max,3))
+  return(list(out1,out2))
+}
+
+# Functions required for GOF tests
+GeodesicDistribution <- function (i, data, sims, period, groupName,
+                                  varName, levls=c(1:5,Inf), cumulative=TRUE, ...) {
+  x <- networkExtraction(i, data, sims, period, groupName, varName)
+  require(sna)
+  a <- sna::geodist(symmetrize(x))$gdist
+  if (cumulative)
+  {
+    gdi <- sapply(levls, function(i){ sum(a<=i) })
+  }
+  else
+  {
+    gdi <- sapply(levls, function(i){ sum(a==i) })
+  }
+  names(gdi) <- as.character(levls)
+  gdi
+}
+
+# Holland and Leinhardt Triad Census; see ?sna::triad.census.
+TriadCensus <- function(i, data, sims, wave, groupName, varName, levls=1:16){
+  unloadNamespace("igraph") # to avoid package clashes
+  require(sna)
+  require(network)
+  x <- networkExtraction(i, data, sims, wave, groupName, varName)
+  if (network.edgecount(x) <= 0){x <- symmetrize(x)}
+  # because else triad.census(x) will lead to an error
+  tc <- sna::triad.census(x)[1,levls]
+  # names are transferred automatically
+  tc
+}
+```
 
 # Data Preparation
 
@@ -39,6 +97,18 @@ net <- sienaDependent(netArray, type="bipartite", nodeSet = c("devs", "pkgs"))
 lapply(netList, dim)   # each network has the same number of actors as needed
 lapply(netList, function(x) table(x, useNA='always'))
 ```
+
+```{r}
+# Plot Network Changes
+g.layout <- gplot(apply(netArray, c(1,2), max), usearrows=T)
+
+par(mfrow=c(1,4))
+for (i in 1:4) {
+  gplot(netArray[,,i], arrowhead.cex=.75, edge.col='gray70', coord=g.layout, 	
+        vertex.cex=1.5, main=paste('Affiliation Network t',i,sep="") )
+}
+```
+
 
 ## Node Sets & Composition Changes
 
@@ -91,6 +161,8 @@ effectsDocumentation(effects)
 ans.model0 <- siena07(algorithm, data=data, effects=effects,
                       batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
                       nbrNodes=4)
+
+outTable(ans.model0)
 ```
 
 ```{r}
@@ -101,7 +173,18 @@ ans.model1 <- siena07(algorithm, data=data, effects=effects,
                       nbrNodes=4)
 ```
 
+# Goodness-of-Fit
 
+```{r}
+# GOF for current estimates with comp changes
+( gof.id <- sienaGOF(ans.model0, verbose=TRUE, varName="net",
+                     IndegreeDistribution, join=T, cumulative=F) )
+plot(gof.id)
+
+( gof.od <- sienaGOF(ans.model0, verbose=TRUE, varName="net",
+                     OutdegreeDistribution, join=T, cumulative=F) )
+plot(gof.od)
+```
 
 # HICSS 2022 Script
 

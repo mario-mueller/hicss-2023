@@ -78,38 +78,6 @@ TriadCensus <- function(i, data, sims, wave, groupName, varName, levls=1:16){
 
 # Data Preparation
 
-## Network
-
-```{r}
-# Load adjacency matrices
-net1 <- as.matrix(read.table('data/adjacency/net-2021-02-01.txt'))
-net2 <- as.matrix(read.table('data/adjacency/net-2021-03-01.txt'))
-net3 <- as.matrix(read.table('data/adjacency/net-2021-04-01.txt'))
-net4 <- as.matrix(read.table('data/adjacency/net-2021-05-01.txt'))
-net5 <- as.matrix(read.table('data/adjacency/net-2021-06-01.txt'))
-
-# Create network object
-netList <- list(net1, net2, net3, net4, net5)
-netArray <- array(c(net1, net2, net3, net4, net5), dim=c(num_devs, num_pkgs, length(netList)))
-net <- sienaDependent(netArray, type="bipartite", nodeSet = c("devs", "pkgs"))
-
-# Check network dimensions
-lapply(netList, dim)   # each network has the same number of actors as needed
-lapply(netList, function(x) table(x, useNA='always'))
-```
-
-```{r}
-# Plot Network Changes
-g.layout <- gplot(apply(netArray, c(1,2), max), usearrows=T)
-
-par(mfrow=c(1,4))
-for (i in 1:4) {
-  gplot(netArray[,,i], arrowhead.cex=.75, edge.col='gray70', coord=g.layout, 	
-        vertex.cex=1.5, main=paste('Affiliation Network t',i,sep="") )
-}
-```
-
-
 ## Node Sets & Composition Changes
 
 ```{r}
@@ -126,8 +94,41 @@ devs <- sienaNodeSet(num_devs, nodeSetName = "devs")
 pkgs <- sienaNodeSet(num_pkgs, nodeSetName = "pkgs")
 
 # Composition Changes for both Node Sets
-devs.comp <- sienaCompositionChangeFromFile('data/compositions/devs_comp.txt', nodeSet = "devs")
-pkgs.comp <- sienaCompositionChangeFromFile('data/compositions/pkgs_comp.txt', nodeSet = "pkgs")
+comp <- sienaCompositionChangeFromFile('data/compositions/comp_change.txt', nodeSet = "devs")
+```
+
+## Network
+
+```{r}
+# Load adjacency matrices
+net1 <- as.matrix(read.table('data/adjacency/net-2021-03-01.txt'))
+net2 <- as.matrix(read.table('data/adjacency/net-2021-04-01.txt'))
+net3 <- as.matrix(read.table('data/adjacency/net-2021-05-01.txt'))
+net4 <- as.matrix(read.table('data/adjacency/net-2021-06-01.txt'))
+net5 <- as.matrix(read.table('data/adjacency/net-2021-07-01.txt'))
+net6 <- as.matrix(read.table('data/adjacency/net-2021-08-01.txt'))
+net7 <- as.matrix(read.table('data/adjacency/net-2021-09-01.txt'))
+net8 <- as.matrix(read.table('data/adjacency/net-2021-10-01.txt'))
+
+# Create network object
+netList <- list(net1, net2, net3, net4, net5, net6, net7, net8)
+netArray <- array(c(net1, net2, net3, net4, net5, net6, net7, net8), dim=c(num_devs, num_pkgs, length(netList)))
+net <- sienaDependent(netArray, type="bipartite", nodeSet = c("devs", "pkgs"))
+
+# Check network dimensions
+lapply(netList, dim)   # each network has the same number of actors as needed
+lapply(netList, function(x) table(x, useNA='always'))
+```
+
+```{r}
+# Plot Network Changes
+g.layout <- gplot(apply(netArray, c(1,2), max), usearrows=T)
+
+par(mfrow=c(3,3))
+for (i in 1:8) {
+  gplot(netArray[,,i], arrowhead.cex=.75, edge.col='gray70', coord=g.layout, 	
+        vertex.cex=1.5, main=paste('Affiliation Network t',i,sep="") )
+}
 ```
 
 ## Individual Variables
@@ -135,17 +136,82 @@ pkgs.comp <- sienaCompositionChangeFromFile('data/compositions/pkgs_comp.txt', n
 ### Packages
 
 ```{r}
-deps_up <- as.matrix(read.table('data/individual/pkg_upstream.txt'))
-deps_down <- as.matrix(read.table('data/individual/pkg_downstream.txt'))
-
+# Dependencies
+deps_up     <- as.matrix(read.table('data/individual/pkg_upstream.txt'))
+deps_down   <- as.matrix(read.table('data/individual/pkg_downstream.txt'))
 depsUpVar   <- varCovar(deps_up, nodeSet = "pkgs")
 depsDownVar <- varCovar(deps_down, nodeSet = "pkgs")
+
+# Community Interest
+com_int   <- as.matrix(read.table('data/individual/pkg_community.txt'))
+comIntVar <- varCovar(com_int, nodeSet = "pkgs")
+
+# Release Activity
+releases  <- as.matrix(read.table('data/individual/pkg_releases.txt'))
+relActVar <- varCovar(releases, nodeSet = "pkgs")
+
+# Age
+age    <- as.matrix(read.table('data/individual/pkg_age.txt'))
+ageVar <- varCovar(age, nodeSet = "pkgs")
+```
+
+### Developers
+
+```{r}
+dev_act   <- as.matrix(read.table('data/individual/dev_activity.txt'))
+devActVar <- varCovar(dev_act, nodeSet = "devs")
+```
+
+## Dyadic Variables
+
+### Upstream Dependencies
+
+```{r}
+# Dependency Associations
+depUp1 <- as.matrix(read.table('data/dyadic/dep_up_associations-2021-03-01.txt'))
+depUp2 <- as.matrix(read.table('data/dyadic/dep_up_associations-2021-04-01.txt'))
+depUp3 <- as.matrix(read.table('data/dyadic/dep_up_associations-2021-05-01.txt'))
+depUp4 <- as.matrix(read.table('data/dyadic/dep_up_associations-2021-06-01.txt'))
+depUp5 <- as.matrix(read.table('data/dyadic/dep_up_associations-2021-07-01.txt'))
+depUp6 <- as.matrix(read.table('data/dyadic/dep_up_associations-2021-08-01.txt'))
+depUp7 <- as.matrix(read.table('data/dyadic/dep_up_associations-2021-09-01.txt'))
+# depUp8 <- as.matrix(read.table('data/dyadic/dep_up_associations-2021-10-01.txt'))
+# Last observation not required
+
+# Create network object
+depUpList  <- list(depUp1, depUp2, depUp3, depUp4, depUp5, depUp6, depUp7)
+depUpArray <- array(c(depUp1, depUp2, depUp3, depUp4, depUp5, depUp6, depUp7),
+                    dim=c(num_devs, num_pkgs, length(depUpList)))
+depUpDyad  <- varDyadCovar(depUpArray, nodeSets = c("devs", "pkgs"), type = "bipartite")
+```
+
+### Downstream Dependencies
+
+```{r}
+# Dependency Associations
+depDown1 <- as.matrix(read.table('data/dyadic/dep_down_associations-2021-03-01.txt'))
+depDown2 <- as.matrix(read.table('data/dyadic/dep_down_associations-2021-04-01.txt'))
+depDown3 <- as.matrix(read.table('data/dyadic/dep_down_associations-2021-05-01.txt'))
+depDown4 <- as.matrix(read.table('data/dyadic/dep_down_associations-2021-06-01.txt'))
+depDown5 <- as.matrix(read.table('data/dyadic/dep_down_associations-2021-07-01.txt'))
+depDown6 <- as.matrix(read.table('data/dyadic/dep_down_associations-2021-08-01.txt'))
+depDown7 <- as.matrix(read.table('data/dyadic/dep_down_associations-2021-09-01.txt'))
+# depDown8 <- as.matrix(read.table('data/dyadic/dep_down_associations-2021-10-01.txt'))
+
+# Create network object
+depDownList  <- list(depDown1, depDown2, depDown3, depDown4, depDown5, depDown6, depDown7)
+depDownArray <- array(c(depDown1, depDown2, depDown3, depDown4, depDown5, depDown6, depDown7),
+                    dim=c(num_devs, num_pkgs, length(depDownList)))
+depDownDyad  <- varDyadCovar(depDownArray, nodeSets = c("devs", "pkgs"), type = "bipartite")
 ```
 
 ## SIENA Data Object
 
 ```{r}
-data <- sienaDataCreate(net, devs.comp, pkgs.comp, depsUpVar, depsDownVar, nodeSets = list(devs, pkgs))
+data <- sienaDataCreate(net, comp, devActVar,
+                        depsUpVar, depsDownVar, comIntVar, relActVar, ageVar,
+                        depUpDyad, depDownDyad,
+                        nodeSets = list(devs, pkgs))
 
 print01Report(data, modelname='hicss-2023')
 ```

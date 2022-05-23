@@ -97,7 +97,9 @@ pkgs <- sienaNodeSet(num_pkgs, nodeSetName = "pkgs")
 comp <- sienaCompositionChangeFromFile('data/compositions/comp_change.txt', nodeSet = "devs")
 ```
 
-## Network
+## Networks
+
+### Affiliation Network (Two-Mode)
 
 ```{r}
 # Load adjacency matrices
@@ -128,6 +130,40 @@ par(mfrow=c(3,3))
 for (i in 1:8) {
   gplot(netArray[,,i], arrowhead.cex=.75, edge.col='gray70', coord=g.layout, 	
         vertex.cex=1.5, main=paste('Affiliation Network t',i,sep="") )
+}
+```
+
+### Dependency Network (One-Mode)
+
+```{r}
+# Load adjacency matrices
+dnet1 <- as.matrix(read.table('data/adjacency/dnet-2021-03-01.txt'))
+dnet2 <- as.matrix(read.table('data/adjacency/dnet-2021-04-01.txt'))
+dnet3 <- as.matrix(read.table('data/adjacency/dnet-2021-05-01.txt'))
+dnet4 <- as.matrix(read.table('data/adjacency/dnet-2021-06-01.txt'))
+dnet5 <- as.matrix(read.table('data/adjacency/dnet-2021-07-01.txt'))
+dnet6 <- as.matrix(read.table('data/adjacency/dnet-2021-08-01.txt'))
+dnet7 <- as.matrix(read.table('data/adjacency/dnet-2021-09-01.txt'))
+dnet8 <- as.matrix(read.table('data/adjacency/dnet-2021-10-01.txt'))
+
+# Create network object
+dnetList <- list(dnet1, dnet2, dnet3, dnet4, dnet5, dnet6, dnet7, dnet8)
+dnetArray <- array(c(dnet1, dnet2, dnet3, dnet4, dnet5, dnet6, dnet7, dnet8), dim=c(num_pkgs, num_pkgs, length(dnetList)))
+dnet <- sienaDependent(dnetArray, type="oneMode", nodeSet = "pkgs")
+
+# Check network dimensions
+lapply(dnetList, dim)   # each network has the same number of actors as needed
+lapply(dnetList, function(x) table(x, useNA='always'))
+```
+
+```{r}
+# Plot Network Changes
+g.layout <- gplot(apply(dnetArray, c(1,2), max), usearrows=T)
+
+par(mfrow=c(3,3))
+for (i in 1:8) {
+  gplot(dnetArray[,,i], arrowhead.cex=.75, edge.col='gray70', coord=g.layout, 	
+        vertex.cex=1.5, main=paste('Dependency Network t',i,sep="") )
 }
 ```
 
@@ -208,6 +244,7 @@ depDownDyad  <- varDyadCovar(depDownArray, nodeSets = c("devs", "pkgs"), type = 
 ## SIENA Data Object
 
 ```{r}
+# TODO Add dnet, but then the package sampling needs to be changed
 data <- sienaDataCreate(net, comp, devActVar,
                         depsUpVar, depsDownVar, comIntVar, relActVar, ageVar,
                         depUpDyad, depDownDyad,
@@ -218,6 +255,7 @@ print01Report(data, modelname='hicss-2023')
 
 # Model Estimations
 
+## Baseline Model
 ```{r}
 algorithm <- sienaAlgorithmCreate(projname='hicss-2023')
 effects <- getEffects(data)
@@ -231,12 +269,34 @@ ans.model0 <- siena07(algorithm, data=data, effects=effects,
 outTable(ans.model0)
 ```
 
+
 ```{r}
-effects <- includeEffects(effects, inPop, name="net",
-                          test=F, fix=F, include=T)
+# effects <- setEffect(effects, egoX, interaction="dev.ten", fix=TRUE, test=TRUE) 
+# effects <-setEffect(effects, altX, interaction="bug.sev", fix=TRUE, test=TRUE)
+```
+
+```{r}
+effects <- setEffect(effects, RateX, type="rate", name="net", interaction1="devActVar", test=TRUE, fix=TRUE)
+ans.model1.stt <- siena07(algorithm, data=data, effects=effects,
+                          batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                          nbrNodes=4)
+outTable(ans.model1.stt)
+```
+
+```{r}
+effects <- setEffect(effects, RateX, type="rate", name="net", interaction1="devActVar", include=TRUE, test=FALSE, fix=FALSE)
 ans.model1 <- siena07(algorithm, data=data, effects=effects,
                       batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
                       nbrNodes=4)
+outTable(ans.model1)
+```
+
+```{r}
+effects <- setEffect(effects, inPop, name="net", test=TRUE, fix=TRUE)
+ans.model2.stt <- siena07(algorithm, data=data, effects=effects,
+                      batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                      nbrNodes=4)
+outTable(ans.model2.stt)
 ```
 
 # Goodness-of-Fit

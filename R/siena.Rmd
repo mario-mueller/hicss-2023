@@ -14,7 +14,7 @@ library(network)
 library(sna)
 library(intergraph)
 library(RSiena)
-setwd("/Users/mariomueller/Workspace/hicss-2023")
+# setwd("/Users/mariomueller/Workspace/hicss-2023")
 ```
 
 # Required Functions
@@ -241,7 +241,7 @@ depDownArray <- array(c(depDown1, depDown2, depDown3, depDown4, depDown5, depDow
 depDownDyad  <- varDyadCovar(depDownArray, nodeSets = c("devs", "pkgs"), type = "bipartite")
 ```
 
-## SIENA Data Object
+## Initialization
 
 ```{r}
 # TODO Add dnet, but then the package sampling needs to be changed
@@ -264,52 +264,138 @@ effectsDocumentation(effects)
 
 ans.model0 <- siena07(algorithm, data=data, effects=effects,
                       batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
-                      nbrNodes=4)
+                      nbrNodes=12)
 
 outTable(ans.model0)
+saveRDS(ans.model0, file = "models/model0.rds")
 ```
 
-
+## Restricted Model
+  
 ```{r}
-# effects <- setEffect(effects, egoX, interaction="dev.ten", fix=TRUE, test=TRUE) 
-# effects <-setEffect(effects, altX, interaction="bug.sev", fix=TRUE, test=TRUE)
-```
+# Package-specific
+effects <- setEffect(effects, altX, name="net", interaction1="depsUpVar",
+                     include=T, test=T, fix=T)
+effects <- setEffect(effects, altX, name="net", interaction1="depsDownVar",
+                     include=T, test=T, fix=T)
+effects <- setEffect(effects, altX, name="net", interaction1="comIntVar",
+                     include=T, test=T, fix=T)
+effects <- setEffect(effects, altX, name="net", interaction1="relActVar",
+                     include=T, test=T, fix=T)
+effects <- setEffect(effects, altX, name="net", interaction1="ageVar",
+                     include=T, test=T, fix=T)
 
-```{r}
-effects <- setEffect(effects, RateX, type="rate", name="net", interaction1="devActVar", test=TRUE, fix=TRUE)
+# Developer-specific
+effects <- setEffect(effects, egoX, name="net", interaction1="devActVar",
+                     include=T, test=T, fix=T)
+
 ans.model1.stt <- siena07(algorithm, data=data, effects=effects,
                           batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
-                          nbrNodes=4)
-outTable(ans.model1.stt)
+                          nbrNodes=12)
+saveRDS(ans.model1.stt, file = "models/model1_stt.rds")
 ```
 
 ```{r}
-effects <- setEffect(effects, RateX, type="rate", name="net", interaction1="devActVar", include=TRUE, test=FALSE, fix=FALSE)
+# Package-specific
+effects <- setEffect(effects, altX, name="net", interaction1="depsUpVar",
+                     include=T, test=F, fix=F)
+effects <- setEffect(effects, altX, name="net", interaction1="depsDownVar",
+                     include=T, test=F, fix=F)
+effects <- setEffect(effects, altX, name="net", interaction1="comIntVar",
+                     include=T, test=F, fix=F)
+effects <- setEffect(effects, altX, name="net", interaction1="relActVar",
+                     include=T, test=F, fix=F)
+effects <- setEffect(effects, altX, name="net", interaction1="ageVar",
+                     include=T, test=F, fix=F)
+
+# Developer-specific
+effects <- setEffect(effects, egoX, name="net", interaction1="devActVar",
+                     include=T, test=F, fix=F)
+
 ans.model1 <- siena07(algorithm, data=data, effects=effects,
                       batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
-                      nbrNodes=4)
+                      nbrNodes=12)
 outTable(ans.model1)
+saveRDS(ans.model1, file = "models/model1.rds")
+```
+
+## Full Model
+
+```{r}
+effects <- setEffect(effects, inPopSqrt, name="net", include=T, test=T, fix=T)
+effects <- setEffect(effects, outActSqrt, name="net", include=T, test=T, fix=T)
+effects <- setEffect(effects, outInAss, name="net", include=T, test=T, fix=T)
+effects <- setEffect(effects, cycle4, name="net", include=T, test=T, fix=T)
+effects <- setEffect(effects, outRate, name="net", type="rate", include=T, test=T, fix=T)
+
+ans.model2.stt <- siena07(algorithm, data=data, effects=effects,
+                          batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                          nbrNodes=12)
+summary(ans.model2.stt)
+saveRDS(ans.model2.stt, file = "models/model2_stt.rds")
 ```
 
 ```{r}
-effects <- setEffect(effects, inPop, name="net", test=TRUE, fix=TRUE)
-ans.model2.stt <- siena07(algorithm, data=data, effects=effects,
+effects <- setEffect(effects, inPopSqrt, name="net", include=T, test=F, fix=F)
+effects <- setEffect(effects, outActSqrt, name="net", include=T, test=F, fix=F)
+effects <- setEffect(effects, outInAss, name="net", include=F, test=F, fix=F)  # Excluded
+effects <- setEffect(effects, cycle4, name="net", include=T, test=F, fix=F)
+effects <- setEffect(effects, outRate, name="net", type="rate", include=T, test=F, fix=F)
+
+ans.model2 <- siena07(algorithm, data=data, effects=effects,
                       batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
-                      nbrNodes=4)
-outTable(ans.model2.stt)
+                      nbrNodes=12)
+outTable(ans.model2)
+saveRDS(ans.model2, file = "models/model2.rds")
+```
+
+Full model performs bad! Check effects separately
+- TODO: Add dyadic variables for up- and downstream dependencies
+
+```{r}
+effects <- setEffect(effects, inPopSqrt, name="net", include=T, test=F, fix=F)
+effects <- setEffect(effects, outActSqrt, name="net", include=F, test=F, fix=F)
+effects <- setEffect(effects, outInAss, name="net", include=F, test=F, fix=F)  # Excluded
+effects <- setEffect(effects, cycle4, name="net", include=F, test=F, fix=F)
+effects <- setEffect(effects, outRate, name="net", type="rate", include=F, test=F, fix=F)
+
+ans.model3 <- siena07(algorithm, data=data, effects=effects,
+                      batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                      nbrNodes=12)
+outTable(ans.model3)
+saveRDS(ans.model3, file = "models/model3.rds")
 ```
 
 # Goodness-of-Fit
 
 ```{r}
-# GOF for current estimates with comp changes
-( gof.id <- sienaGOF(ans.model0, verbose=TRUE, varName="net",
-                     IndegreeDistribution, join=T, cumulative=F) )
-plot(gof.id)
+# Indegree Distributions
+( gof.id.model0 <- sienaGOF(ans.model0, verbose=TRUE, varName="net",
+                            IndegreeDistribution, join=T, cumulative=F) )
+p1 <- plot(gof.id.model0)
 
-( gof.od <- sienaGOF(ans.model0, verbose=TRUE, varName="net",
-                     OutdegreeDistribution, join=T, cumulative=F) )
-plot(gof.od)
+( gof.id.model1 <- sienaGOF(ans.model1, verbose=TRUE, varName="net",
+                            IndegreeDistribution, join=T, cumulative=F) )
+p2 <- plot(gof.id.model1)
+
+( gof.id.model2 <- sienaGOF(ans.model2, verbose=TRUE, varName="net",
+                            IndegreeDistribution, join=T, cumulative=F) )
+p3 <- plot(gof.id.model2)
+```
+
+```{r}
+# Outdegree Distributions
+( gof.od.model0 <- sienaGOF(ans.model0, verbose=TRUE, varName="net",
+                            OutdegreeDistribution, join=T, cumulative=F) )
+p4 <- plot(gof.od.model0)
+
+( gof.od.model1 <- sienaGOF(ans.model1, verbose=TRUE, varName="net",
+                            OutdegreeDistribution, join=T, cumulative=F) )
+p5 <- plot(gof.od.model1)
+
+( gof.od.model2 <- sienaGOF(ans.model2, verbose=TRUE, varName="net",
+                            OutdegreeDistribution, join=T, cumulative=F) )
+p6 <- plot(gof.od.model2)
 ```
 
 # HICSS 2022 Script

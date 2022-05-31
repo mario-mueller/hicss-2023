@@ -457,9 +457,9 @@ outTable(ans.model3)
 effects4 <- effects3
 
 effects4 <- setEffect(effects4, altX, name="net", interaction1="depsUpLogVar",
-                      include=F, test=F, fix=F)
+                      include=T, test=T, fix=T)
 effects4 <- setEffect(effects4, altX, name="net", interaction1="depsDownLogVar",
-                      include=T, test=F, fix=F)
+                      include=T, test=T, fix=T)
 
 ans.model4.stt <- siena07(algorithm, data=data, effects=effects4,
                           batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
@@ -468,20 +468,18 @@ summary(ans.model4.stt)
 ```
 
 ```{r}
-effects3 <- effects2
+effects4 <- effects3
 
-effects3 <- setEffect(effects3, egoX, name="net", interaction1="devActLogVar",
+effects4 <- setEffect(effects4, altX, name="net", interaction1="depsUpLogVar",
                       include=T, test=F, fix=F)
-effects3 <- setEffect(effects3, altX, name="net", interaction1="comIntLogVar",
-                      include=T, test=F, fix=F)
-effects3 <- setEffect(effects3, altX, name="net", interaction1="relActLogVar",
+effects4 <- setEffect(effects4, altX, name="net", interaction1="depsDownLogVar",
                       include=T, test=F, fix=F)
 
-ans.model3 <- siena07(algorithm, data=data, effects=effects3,
+ans.model4 <- siena07(algorithm, data=data, effects=effects4,
                       batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
                       byWave=T, nbrNodes=12)
 
-outTable(ans.model3)
+outTable(ans.model4)
 ```
 
 ## Model 5
@@ -501,3 +499,42 @@ ans.model5.stt <- siena07(algorithm, data=data, effects=effects5,
                           byWave=T, nbrNodes=12)
 summary(ans.model5.stt)
 ```
+
+```{r}
+effects5 <- effects4
+
+effects5 <- setEffect(effects5, X, name="net", interaction1="depUpDyad",
+                      include=T, test=F, fix=F)
+effects5 <- setEffect(effects5, X, name="net", interaction1="depDownDyad",
+                      include=T, test=F, fix=F)
+
+ans.model5 <- siena07(algorithm, data=data, effects=effects5,
+                      batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                      byWave=T, nbrNodes=12)
+
+outTable(ans.model5)
+```
+
+```{r}
+texreg::htmlreg(list(ans.model1, ans.model2, ans.model3, ans.model4, ans.model5),
+                stars = c(0.05, 0.01, 0.001),
+                single.row = TRUE, include.iterations = FALSE,
+                file = 'tables/preliminary.html')
+```
+
+```{r}
+# GOF
+gof.id5 <- sienaGOF(ans.model5, verbose=TRUE, varName="net",
+                   IndegreeDistribution, join=T, cumulative=F)
+plot(gof.id5)
+
+gof.od5 <- sienaGOF(ans.model5, verbose=TRUE, varName="net",
+                    OutdegreeDistribution, join=T, cumulative=F)
+plot(gof.od5)
+```
+
+## Model 6
+
+More potential effects (described in Amati et al. 2021):
+
+outTrunc: Outdegree truncated at # (2): Developers tend to participate only in 1

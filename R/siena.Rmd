@@ -14,6 +14,7 @@ library(network)
 library(sna)
 library(intergraph)
 library(RSiena)
+library(multiSiena)
 library(patchwork)
 library(texreg)
 # setwd("/Users/mariomueller/Workspace/hicss-2023")
@@ -178,6 +179,10 @@ relActVar <- varCovar(releases, nodeSet = "pkgs")
 releases_log <- log(releases + 1)
 relActLogVar <- varCovar(releases_log, nodeSet = "pkgs", centered = T)
 
+# Repository Owner Type
+types <- as.matrix(read.table('data/individual/pkg_repo_types.txt'))
+typeVar <- coCovar(types, nodeSet = "pkgs")
+
 # Age
 age    <- as.matrix(read.table('data/individual/pkg_age.txt'))
 ageVar <- varCovar(age, nodeSet = "pkgs")
@@ -253,15 +258,18 @@ print01Report(data, modelname='hicss-2023')
 
 # Model Selection
 
+## Model 0
+
 ```{r}
-algorithm <- sienaAlgorithmCreate(projname='hicss-2023')
+algorithm <- sienaAlgorithmCreate(projname='hicss-2023', n3=3000) # 1000 standard, 3000 for pub
 effects <- getEffects(data)
 effectsDocumentation(effects)
 
+# effects <- includeGMoMStatistics(effects, density, include=T)
 
 ans.model0 <- siena07(algorithm, data=data, effects=effects,
                       batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
-                      nbrNodes=12)
+                      byWave=T, nbrNodes=12)
 
 outTable(ans.model0)
 
@@ -271,9 +279,562 @@ gof.string0 <- sprintf("%.2f (%d)", wald0$chisquare, wald0$df)
 texreg::htmlreg(ans.model0,
                 single.row = TRUE, include.iterations = FALSE,
                 custom.gof.rows = list("Wald Statistics" = gof.string0),
-                file = 'tables/model0.html')
+                file = 'tables/pre_results.html')
 
 saveRDS(ans.model0, file = "models/model0.rds")
+# ans.model0 <- readRDS("models/model0.rds")
+```
+
+## Model 1
+
+```{r}
+# c =  10.6703   d.f. = 1  p-value =   0.0011
+effects <- setEffect(effects, egoX, name="net", interaction1="devActLogVar",
+                     include=T, test=T, fix=T)
+# c = 915.3524   d.f. = 1  p-value < 0.0001
+effects <- setEffect(effects, altX, name="net", interaction1="comIntLogVar",
+                     include=T, test=T, fix=T)
+# c = 179.5559   d.f. = 1  p-value < 0.0001
+effects <- setEffect(effects, altX, name="net", interaction1="relActLogVar",
+                     include=T, test=T, fix=T)
+# c =  40.4700   d.f. = 1  p-value < 0.0001
+effects <- setEffect(effects, altX, name="net", interaction1="ageLogVar",
+                     include=T, test=T, fix=T)
+
+
+ans.model1.stt <- siena07(algorithm, data=data, effects=effects,
+                          batch=F, verbose=F, returnDeps=T,
+                          initC=T, useCluster=T, byWave=T,
+                          nbrNodes=12)
+saveRDS(ans.model1.stt, file = "models/model1.stt.rds")
+```
+
+```{r}
+effects <- setEffect(effects, egoX, name="net", interaction1="devActLogVar",
+                     include=F, test=F, fix=F)
+effects <- setEffect(effects, altX, name="net", interaction1="comIntLogVar",
+                     include=T, test=F, fix=F)
+effects <- setEffect(effects, altX, name="net", interaction1="relActLogVar",
+                     include=T, test=F, fix=F)
+effects <- setEffect(effects, altX, name="net", interaction1="ageLogVar",
+                     include=T, test=F, fix=F)
+
+
+ans.model1 <- siena07(algorithm, data=data, effects=effects,
+                      batch=F, verbose=F, returnDeps=T,
+                      initC=T, useCluster=T, byWave=T,
+                      nbrNodes=12)
+
+wald1 <- Multipar.RSiena(ans.model1, c(8:ans.model1$pp))
+gof.string1 <- sprintf("%.2f (%d)", wald1$chisquare, wald1$df)
+
+outTable(ans.model1)
+texreg::htmlreg(list(ans.model0, ans.model1),
+                stars = c(0.05, 0.01, 0.001),
+                single.row = TRUE, include.iterations = FALSE,
+                custom.gof.rows = list("Wald Statistics" = c(gof.string0, gof.string1)),
+                file = 'tables/pre_results.html')
+saveRDS(ans.model1, file = "models/model1.rds")
+```
+
+## Model 2
+
+```{r}
+# c =   0.7837   d.f. = 1  p-value =   0.3760
+effects <- setEffect(effects, altX, name="net", interaction1="depsUpLogVar",
+                     include=T, test=T, fix=T)
+# c =  16.5777   d.f. = 1  p-value < 0.0001
+effects <- setEffect(effects, altX, name="net", interaction1="depsDownLogVar",
+                     include=T, test=T, fix=T)
+
+ans.model2.stt <- siena07(algorithm, data=data, effects=effects,
+                          batch=F, verbose=F, returnDeps=T,
+                          initC=T, useCluster=T, byWave=T,
+                          nbrNodes=12)
+
+saveRDS(ans.model2.stt, file = "models/model2.stt.rds")
+```
+
+```{r}
+effects <- setEffect(effects, altX, name="net", interaction1="depsUpLogVar",
+                     include=F, test=F, fix=F)
+effects <- setEffect(effects, altX, name="net", interaction1="depsDownLogVar",
+                     include=T, test=F, fix=F)
+
+ans.model2 <- siena07(algorithm, data=data, effects=effects,
+                      batch=F, verbose=F, returnDeps=T,
+                      initC=T, useCluster=T, byWave=T,
+                      nbrNodes=12)
+
+wald2 <- Multipar.RSiena(ans.model2, c(8:ans.model2$pp))
+gof.string2 <- sprintf("%.2f (%d)", wald2$chisquare, wald2$df)
+
+outTable(ans.model2)
+
+texreg::htmlreg(list(ans.model0, ans.model1, ans.model2),
+                stars = c(0.05, 0.01, 0.001),
+                single.row = TRUE, include.iterations = FALSE,
+                custom.gof.rows = list(
+                  "Wald Statistics" = c(gof.string0, gof.string1, gof.string2)),
+                file = 'tables/pre_results.html')
+
+saveRDS(ans.model2, file = "models/model2.rds")
+```
+
+## Model 3
+
+```{r}
+# c =  27.1005   d.f. = 1  p-value < 0.0001
+effects <- setEffect(effects, X, name="net", interaction1="depUpDyad",
+                     include=T, test=T, fix=T)
+# c =  11.5357   d.f. = 1  p-value =   0.0007
+effects <- setEffect(effects, X, name="net", interaction1="depDownDyad",
+                     include=T, test=T, fix=T)
+
+ans.model3.stt <- siena07(algorithm, data=data, effects=effects,
+                          batch=F, verbose=F, returnDeps=T,
+                          initC=T, useCluster=T, byWave=T,
+                          nbrNodes=12)
+
+saveRDS(ans.model3.stt, file = "models/model3.stt.rds")
+```
+
+```{r}
+effects <- setEffect(effects, X, name="net", interaction1="depUpDyad",
+                     include=T, test=F, fix=F)
+effects <- setEffect(effects, X, name="net", interaction1="depDownDyad",
+                     include=F, test=F, fix=F)
+
+ans.model3 <- siena07(algorithm, data=data, effects=effects,
+                      batch=F, verbose=F, returnDeps=T,
+                      initC=T, useCluster=T, byWave=T,
+                      nbrNodes=12)
+
+wald3 <- Multipar.RSiena(ans.model3, c(8:ans.model3$pp))
+gof.string3 <- sprintf("%.2f (%d)", wald3$chisquare, wald3$df)
+
+outTable(ans.model3)
+
+texreg::htmlreg(list(ans.model0, ans.model1, ans.model2, ans.model3),
+                stars = c(0.05, 0.01, 0.001),
+                single.row = TRUE, include.iterations = FALSE,
+                custom.gof.rows = list(
+                  "Wald Statistics" = c(
+                    gof.string0, gof.string1, gof.string2, gof.string3)),
+                file = 'tables/pre_results.html')
+
+saveRDS(ans.model3, file = "models/model3.rds")
+```
+
+```{r}
+gof.id3 <- sienaGOF(ans.model3, verbose=TRUE, varName="net",
+                   IndegreeDistribution, join=T, cumulative=F)
+plot(gof.id3)
+
+gof.od3 <- sienaGOF(ans.model3, verbose=TRUE, varName="net",
+                    OutdegreeDistribution, join=T, cumulative=F)
+plot(gof.od3)
+```
+
+## Model 4
+
+```{r}
+# Effect reduces wald test score
+effects <- setEffect(effects, X, name="net", interaction1="depUpDyad",
+                     include=F, test=F, fix=F)
+
+# Rate effects
+# c = 137.0951   d.f. = 1  p-value < 0.0001
+effects <- setEffect(effects, outRate, name="net", type="rate",
+                     include=T, test=T, fix=T)
+# c = 430.8969   d.f. = 1  p-value < 0.0001
+effects <- setEffect(effects, outRateInv, name="net", type="rate",
+                     include=T, test=T, fix=T)
+# c = 318.3517   d.f. = 1  p-value < 0.0001
+effects <- setEffect(effects, outRateLog, name="net", type="rate",
+                     include=T, test=T, fix=T)
+# c = 125.3913   d.f. = 1  p-value < 0.0001
+effects <- setEffect(effects, RateX, name="net", type="rate", interaction1="devActLogVar",
+                     include=T, test=T, fix=T)
+
+ans.model4.stt <- siena07(algorithm, data=data, effects=effects,
+                          batch=F, verbose=F, returnDeps=T,
+                          initC=T, useCluster=T, byWave=T,
+                          nbrNodes=12)
+
+saveRDS(ans.model4.stt, file = "models/model4.stt.rds")
+
+```
+
+```{r}
+# Rate effects; TODO LATER
+effects <- setEffect(effects, outRate, name="net", type="rate",
+                     include=F, test=F, fix=F)
+# If included, Wald statistics improve, but convergence bad!
+effects <- setEffect(effects, outRateInv, name="net", type="rate",
+                     include=F, test=F, fix=F)
+# If included, model does not converge
+effects <- setEffect(effects, outRateLog, name="net", type="rate",
+                     include=F, test=F, fix=F)
+effects <- setEffect(effects, RateX, name="net", type="rate", interaction1="devActLogVar",
+                     include=F, test=F, fix=F)
+
+ans.model4 <- siena07(algorithm, data=data, effects=effects,
+                      batch=F, verbose=F, returnDeps=T,
+                      initC=T, useCluster=T, byWave=T,
+                      nbrNodes=12)
+
+wald4 <- Multipar.RSiena(ans.model4, c(8:ans.model4$pp))
+gof.string4 <- sprintf("%.2f (%d)", wald4$chisquare, wald4$df)
+
+outTable(ans.model4)
+
+texreg::htmlreg(list(ans.model0, ans.model1, ans.model2,
+                     ans.model3, ans.model4),
+                stars = c(0.05, 0.01, 0.001),
+                single.row = TRUE, include.iterations = FALSE,
+                custom.gof.rows = list(
+                  "Wald Statistics" = c(
+                    gof.string0, gof.string1, gof.string2,
+                    gof.string3, gof.string4)),
+                file = 'tables/pre_results.html')
+
+saveRDS(ans.model4, file = "models/model4.rds")
+```
+
+```{r}
+gof.id4 <- sienaGOF(ans.model4, verbose=TRUE, varName="net",
+                   IndegreeDistribution, join=T, cumulative=F)
+plot(gof.id4)
+
+gof.od4 <- sienaGOF(ans.model4, verbose=TRUE, varName="net",
+                    OutdegreeDistribution, join=T, cumulative=F)
+plot(gof.od4)
+```
+
+## Model 5
+
+```{r}
+# c = 490.3907   d.f. = 1  p-value < 0.0001
+effects <- setEffect(effects, inPopSqrt, name="net", initialValue = 0,
+                     include=T, test=T, fix=T)
+# c =  37.4565   d.f. = 1  p-value < 0.0001
+effects <- setEffect(effects, outActSqrt, name="net", initialValue = 0,
+                     include=T, test=T, fix=T)
+
+ans.model5.stt <- siena07(algorithm, data=data, effects=effects,
+                          batch=F, verbose=F, returnDeps=T,
+                          initC=T, useCluster=T, byWave=T,
+                          nbrNodes=12)
+
+saveRDS(ans.model5.stt, file = "models/model5.stt.rds")
+```
+
+```{r}
+effects <- setEffect(effects, inPopSqrt, name="net", initialValue = 0,
+                     include=T, test=F, fix=F)
+effects <- setEffect(effects, outActSqrt, name="net", initialValue = 0,
+                     include=F, test=F, fix=F)
+
+ans.model5 <- siena07(algorithm, data=data, effects=effects,
+                      batch=F, verbose=F, returnDeps=T,
+                      initC=T, useCluster=T, byWave=T,
+                      nbrNodes=12)
+
+wald5 <- Multipar.RSiena(ans.model5, c(8:ans.model5$pp))
+gof.string5 <- sprintf("%.2f (%d)", wald5$chisquare, wald5$df)
+
+outTable(ans.model5)
+
+texreg::htmlreg(list(ans.model0, ans.model1, ans.model2,
+                     ans.model3, ans.model4, ans.model5),
+                stars = c(0.05, 0.01, 0.001),
+                single.row = TRUE, include.iterations = FALSE,
+                custom.gof.rows = list(
+                  "Wald Statistics" = c(
+                    gof.string0, gof.string1, gof.string2,
+                    gof.string3, gof.string4, gof.string5)),
+                file = 'tables/pre_results.html')
+
+saveRDS(ans.model5, file = "models/model5.rds")
+```
+
+```{r}
+gof.id5 <- sienaGOF(ans.model5, verbose=TRUE, varName="net",
+                   IndegreeDistribution, join=T, cumulative=F)
+plot(gof.id5)
+
+gof.od5 <- sienaGOF(ans.model5, verbose=TRUE, varName="net",
+                    OutdegreeDistribution, join=T, cumulative=F)
+plot(gof.od5)
+```
+
+```{r}
+# Include time dummy
+effects.tt <- includeTimeDummy(effects, density, inPopSqrt)
+
+ans.model5.tt <- siena07(algorithm, data=data, effects=effects.tt,
+                         batch=F, verbose=F, returnDeps=T,
+                         initC=T, useCluster=T, byWave=T,
+                         nbrNodes=12)
+
+Multipar.RSiena(ans.model5.tt, c(8:ans.model5$pp))
+
+gof.id5.tt <- sienaGOF(ans.model5.tt, verbose=TRUE, varName="net",
+                       IndegreeDistribution, join=T, cumulative=F)
+plot(gof.id5.tt)
+
+gof.od5.tt <- sienaGOF(ans.model5.tt, verbose=TRUE, varName="net",
+                       OutdegreeDistribution, join=T, cumulative=F)
+plot(gof.od5.tt)
+```
+
+## Model 6
+
+```{r}
+# effects <- includeTimeDummy(effects, density, inPopSqrt, include = F)
+# c =   6.1510   d.f. = 1  p-value =   0.0131
+effects <- setEffect(effects, cycle4, name="net", include=T, test=T, fix=T)
+# c =  56.6126   d.f. = 1  p-value < 0.0001
+effects <- setEffect(effects, outIso, name="net", include=T, test=T, fix=T)
+# c =   5.7118   d.f. = 1  p-value =   0.0169
+effects <- setEffect(effects, antiInIso, name="net", include=T, test=T, fix=T)
+# c =  93.6327   d.f. = 1  p-value < 0.0001
+effects <- setEffect(effects, outInAss, name="net", include=T, test=T, fix=T) 
+
+ans.model6.stt <- siena07(algorithm, data=data, effects=effects,
+                          batch=F, verbose=F, returnDeps=T,
+                          initC=T, useCluster=T, byWave=T,
+                          nbrNodes=12)
+summary(ans.model6.stt)
+
+saveRDS(ans.model6.stt, file = "models/model6.stt.rds")
+```
+
+```{r}
+effects <- setEffect(effects, cycle4, name="net", include=F, test=F, fix=F)
+effects <- setEffect(effects, outIso, name="net", include=F, test=F, fix=F)
+effects <- setEffect(effects, antiInIso, name="net", include=F, test=F, fix=F)
+effects <- setEffect(effects, outInAss, name="net", include=T, test=F, fix=F) 
+
+ans.model6 <- siena07(algorithm, data=data, effects=effects,
+                      batch=F, verbose=F, returnDeps=T,
+                      initC=T, useCluster=T, byWave=T,
+                      nbrNodes=12)
+
+wald6 <- Multipar.RSiena(ans.model6, c(8:ans.model6$pp))
+gof.string6 <- sprintf("%.2f (%d)", wald6$chisquare, wald6$df)
+
+outTable(ans.model6)
+
+texreg::htmlreg(list(ans.model0, ans.model1, ans.model2,
+                     ans.model3, ans.model4, ans.model5,
+                     ans.model6),
+                stars = c(0.05, 0.01, 0.001),
+                single.row = TRUE, include.iterations = FALSE,
+                custom.gof.rows = list(
+                  "Wald Statistics" = c(
+                    gof.string0, gof.string1, gof.string2,
+                    gof.string3, gof.string4, gof.string5,
+                    gof.string6)),
+                file = 'tables/pre_results.html')
+
+saveRDS(ans.model6, file = "models/model6.rds")
+
+gof.id6 <- sienaGOF(ans.model6, verbose=TRUE, varName="net",
+                    IndegreeDistribution, join=T, cumulative=F)
+plot(gof.id6)
+
+gof.od6 <- sienaGOF(ans.model6, verbose=TRUE, varName="net",
+                    OutdegreeDistribution, join=T, cumulative=F)
+plot(gof.od6)
+```
+
+## Model 7
+
+```{r}
+# c =   6.1510   d.f. = 1  p-value =   0.0131
+effects <- setEffect(effects, outTrunc, name="net", include=F, test=F, fix=F)
+# c =  56.6126   d.f. = 1  p-value < 0.0001
+effects <- setEffect(effects, outMore, name="net", include=F, test=F, fix=F)
+# c =   5.7118   d.f. = 1  p-value =   0.0169
+effects <- setEffect(effects, outInv, name="net", include=F, test=F, fix=F)
+
+effects <- setEffect(effects, homXOutAct, name="net", interaction1 = "comIntLogVar",
+                     include=T, test=T, fix=T)
+effects <- setEffect(effects, homXOutAct, name="net", interaction1 = "depsUpLogVar",
+                     include=T, test=T, fix=T)
+effects <- setEffect(effects, homXOutAct, name="net", interaction1 = "depsDownLogVar",
+                     include=T, test=T, fix=T)
+
+ans.model7.stt <- siena07(algorithm, data=data, effects=effects,
+                          batch=F, verbose=F, returnDeps=T,
+                          initC=T, useCluster=T, byWave=T,
+                          nbrNodes=12)
+summary(ans.model7.stt)
+
+saveRDS(ans.model7.stt, file = "models/model7.stt.rds")
+```
+
+```{r}
+effects <- setEffect(effects, homXOutAct, name="net", interaction1 = "comIntLogVar",
+                     include=F, test=T, fix=T)
+effects <- setEffect(effects, homXOutAct, name="net", interaction1 = "depsUpLogVar",
+                     include=F, test=T, fix=T)
+effects <- setEffect(effects, homXOutAct, name="net", interaction1 = "depsDownLogVar",
+                     include=T, test=F, fix=F)
+
+ans.model7 <- siena07(algorithm, data=data, effects=effects,
+                      batch=F, verbose=F, returnDeps=T,
+                      initC=T, useCluster=T, byWave=T,
+                      nbrNodes=12)
+
+wald7 <- Multipar.RSiena(ans.model7, c(8:ans.model7$pp))
+gof.string7 <- sprintf("%.2f (%d)", wald7$chisquare, wald7$df)
+
+outTable(ans.model7)
+
+texreg::htmlreg(list(ans.model0, ans.model1, ans.model2,
+                     ans.model3, ans.model4, ans.model5,
+                     ans.model6, ans.model7),
+                stars = c(0.05, 0.01, 0.001),
+                single.row = TRUE, include.iterations = FALSE,
+                custom.gof.rows = list(
+                  "Wald Statistics" = c(
+                    gof.string0, gof.string1, gof.string2,
+                    gof.string3, gof.string4, gof.string5,
+                    gof.string6, gof.string7)),
+                file = 'tables/pre_results.html')
+
+saveRDS(ans.model7, file = "models/model7.rds")
+
+gof.id7 <- sienaGOF(ans.model7, verbose=TRUE, varName="net",
+                    IndegreeDistribution, join=T, cumulative=F)
+plot(gof.id7)
+
+gof.od7 <- sienaGOF(ans.model7, verbose=TRUE, varName="net",
+                    OutdegreeDistribution, join=T, cumulative=F)
+plot(gof.od7)
+```
+
+---
+
+# SELECTION EXPERIMENTS
+
+```{r}
+# Add controls
+effects <- setEffect(effects, altX, name="net", interaction1="comIntLogVar",
+                     include=T, test=T, fix=T)
+
+ans.model1b <- siena07(algorithm, data=data, effects=effects,
+                       batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                       byWave=T, nbrNodes=12)
+wald1b <- Multipar.RSiena(ans.model1b, c(8:ans.model1b$pp))
+gof.string1b <- sprintf("%.2f (%d)", wald1b$chisquare, wald1b$df)
+
+outTable(ans.model1b)
+texreg::htmlreg(list(ans.model0, ans.model1b),
+                stars = c(0.05, 0.01, 0.001),
+                single.row = TRUE, include.iterations = FALSE,
+                custom.gof.rows = list("Wald Statistics" = c(gof.string0, gof.string1b)),
+                file = 'tables/pre_results.html')
+saveRDS(ans.model1b, file = "models/model1b.rds")
+# ans.model1 <- readRDS("models/model1.rds")
+```
+
+```{r}
+effects <- setEffect(effects, altX, name="net", interaction1="relActLogVar",
+                     include=F, test=F, fix=F)
+# Release Activity does not improve
+effects <- setEffect(effects, altX, name="net", interaction1="ageLogVar",
+                     include=F, test=F, fix=F)
+# Age does not improve
+effects <- setEffect(effects, egoX, name="net", interaction1="devActLogVar",
+                     include=F, test=F, fix=F)
+# Developer Activity does not improve
+effects <- setEffect(effects, X, name="net", interaction1="depUpDyad",
+                     include=T, test=F, fix=F)
+effects <- setEffect(effects, X, name="net", interaction1="depDownDyad",
+                     include=T, test=F, fix=F)
+
+
+ans.model2b <- siena07(algorithm, data=data, effects=effects,
+                       batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                       byWave=T, nbrNodes=12)
+wald2b <- Multipar.RSiena(ans.model2b, c(8:ans.model2b$pp))
+gof.string2b <- sprintf("%.2f (%d)", wald2b$chisquare, wald2b$df)
+
+outTable(ans.model2b)
+texreg::htmlreg(list(ans.model0, ans.model1b, ans.model2b),
+                stars = c(0.05, 0.01, 0.001),
+                single.row = TRUE, include.iterations = FALSE,
+                custom.gof.rows = list(
+                  "Wald Statistics" = c(gof.string0, gof.string1b, gof.string2b)),
+                file = 'tables/pre_results.html')
+saveRDS(ans.model2b, file = "models/model2b.rds")
+# ans.model1 <- readRDS("models/model1.rds")
+```
+
+
+```{r}
+effects <- setEffect(effects, egoX, name="net", interaction1="devActLogVar",
+                     include=F, test=F, fix=F)
+```
+
+
+```{r}
+gof.id.1b <- sienaGOF(ans.model1b, verbose=TRUE, varName="net",
+                   IndegreeDistribution, join=T, cumulative=F)
+plot(gof.id.1b)
+
+gof.od.1b <- sienaGOF(ans.model1b, verbose=TRUE, varName="net",
+                   OutdegreeDistribution, join=T, cumulative=F)
+plot(gof.od.1b)
+```
+
+```{r}
+# Add Covariate Effects
+
+
+# Without depsUp and depsDown as covariate -> 5437.83 (7)
+effects <- setEffect(effects, X, name="net", interaction1="depUpDyad",
+                     include=T, test=F, fix=F)
+effects <- setEffect(effects, X, name="net", interaction1="depDownDyad",
+                     include=T, test=F, fix=F)
+
+# With depsUp and depsDown as covariate -> 5104.90 (9)
+effects <- setEffect(effects, altX, name="net", interaction1="depsDownLogVar",
+                     include=F, test=F, fix=F)
+effects <- setEffect(effects, altX, name="net", interaction1="depsUpLogVar",
+                     include=F, test=F, fix=F)
+# --> Keep it out for now
+
+
+ans.model2b <- siena07(algorithm, data=data, effects=effects,
+                       batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                       nbrNodes=12)
+wald2b <- Multipar.RSiena(ans.model2b, c(8:ans.model2b$pp))
+gof.string2b <- sprintf("%.2f (%d)", wald2b$chisquare, wald2b$df)
+
+outTable(ans.model2b)
+texreg::htmlreg(list(ans.model0, ans.model1b, ans.model2b),
+                stars = c(0.05, 0.01, 0.001),
+                single.row = TRUE, include.iterations = FALSE,
+                custom.gof.rows = list(
+                  "Wald Statistics" = c(gof.string0, gof.string1b, gof.string2b)),
+                file = 'tables/pre_results.html')
+saveRDS(ans.model2b, file = "models/model2b.rds")
+
+```
+
+```{r}
+gof.id.2b <- sienaGOF(ans.model2b, verbose=TRUE, varName="net",
+                   IndegreeDistribution, join=T, cumulative=F)
+plot(gof.id.2b)
+
+gof.od.2b <- sienaGOF(ans.model2b, verbose=TRUE, varName="net",
+                   OutdegreeDistribution, join=T, cumulative=F)
+plot(gof.od.2b)
 ```
 
 ## Endogenous Effects
@@ -294,6 +855,252 @@ texreg::htmlreg(list(ans.model0, ans.model1),
                 custom.gof.rows = list("Wald Statistics" = c(gof.string0, gof.string1)),
                 file = 'tables/model1.html')
 saveRDS(ans.model1, file = "models/model1.rds")
+# ans.model1 <- readRDS("models/model1.rds")
+```
+
+```{r}
+effects <- setEffect(effects, inPopSqrt, name="net", include=T, test=F, fix=F)
+effects <- setEffect(effects, inPop, name="net", include=F, test=F, fix=F)
+effects <- setEffect(effects, outTrunc, name="net", include=F, test=F, fix=F)
+# High correlation with inPopSqrt and outdegree
+effects <- setEffect(effects, outInAss, name="net", include=F, test=F, fix=F) 
+effects <- setEffect(effects, cycle4, name="net", include=F, test=F, fix=F)
+effects <- setEffect(effects, outIso, name="net", include=F, test=F, fix=F)
+effects <- setEffect(effects, antiInIso, name="net", include=F, test=F, fix=F)
+
+effects <- setEffect(effects, altX, name="net", interaction1="comIntLogVar",
+                     include=T, test=F, fix=F)
+effects <- setEffect(effects, altX, name="net", interaction1="relActLogVar",
+                     include=T, test=F, fix=F)
+effects <- setEffect(effects, altX, name="net", interaction1="ageLogVar",
+                     include=T, test=F, fix=F)
+effects <- setEffect(effects, egoX, name="net", interaction1="devActLogVar",
+                     include=T, test=F, fix=F)
+
+# 5543.50 (8) before adding depsdownlogvar and depsuplogvar
+effects <- setEffect(effects, altX, name="net", interaction1="depsDownLogVar",
+                     include=T, test=F, fix=F)
+effects <- setEffect(effects, altX, name="net", interaction1="depsUpLogVar",
+                     include=T, test=F, fix=F)
+
+effects <- setEffect(effects, X, name="net", interaction1="depUpDyad",
+                     include=T, test=F, fix=F)
+effects <- setEffect(effects, X, name="net", interaction1="depDownDyad",
+                     include=T, test=F, fix=F)
+
+# effects <- includeTimeDummy(effects, cycle4, timeDummy = "all", include=F)
+
+ans.model2b <- siena07(algorithm, data=data, effects=effects,
+                      batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                      nbrNodes=12)
+wald2b <- Multipar.RSiena(ans.model2b, c(8:ans.model2b$pp))
+gof.string2b <- sprintf("%.2f (%d)", wald2b$chisquare, wald2b$df)
+
+outTable(ans.model2b)
+texreg::htmlreg(list(ans.model0, ans.model1, ans.model2b),
+                stars = c(0.05, 0.01, 0.001),
+                single.row = TRUE, include.iterations = FALSE,
+                custom.gof.rows = list(
+                  "Wald Statistics" = c(gof.string0, gof.string1, gof.string2b)),
+                file = 'tables/model2b.html')
+saveRDS(ans.model2b, file = "models/model2b.rds")
+# ans.model2b <- readRDS("models/model2b.rds")
+```
+
+```{r}
+gof.id.2b <- sienaGOF(ans.model2b, verbose=TRUE, varName="net",
+                   IndegreeDistribution, join=T, cumulative=F)
+plot(gof.id.2b, violin=T)
+
+gof.od.2b <- sienaGOF(ans.model2b, verbose=TRUE, varName="net",
+                   OutdegreeDistribution, join=T, cumulative=F)
+plot(gof.od.2b)
+```
+
+```{r}
+effects <- setEffect(effects, inPopSqrt, name="net", include=T, test=F, fix=F)
+effects <- setEffect(effects, outInAss, name="net", include=F, test=F, fix=F) 
+effects <- setEffect(effects, cycle4, name="net", include=F, test=F, fix=F)
+
+effects <- setEffect(effects, inPop, name="net", include=F, test=F, fix=F)
+effects <- setEffect(effects, outTrunc, name="net", include=F, test=F, fix=F)
+effects <- setEffect(effects, outIso, name="net", include=F, test=F, fix=F)
+effects <- setEffect(effects, antiInIso, name="net", include=F, test=F, fix=F)
+
+# effects <- includeTimeDummy(effects, cycle4, timeDummy = "all", include=F)
+
+# Not good, makes model fit poor, GOF outdegree bad, Wald bad
+effects <- setEffect(effects, homXOutAct, name="net", interaction1="depsUpLogVar",
+                     include=F, test=F, fix=F)
+effects <- setEffect(effects, homXOutAct, name="net", interaction1="depsDownLogVar",
+                     include=F, test=F, fix=F)
+
+# GOOD! Improves Wald score and GOF p-values
+effects <- setEffect(effects, outActX, name="net", interaction1="depsUpLogVar",
+                     include=T, test=F, fix=F)
+effects <- setEffect(effects, outActX, name="net", interaction1="depsDownLogVar",
+                     include=T, test=F, fix=F)
+
+effects <- setEffect(effects, altX, name="net", interaction1="depsDownLogVar",
+                     include=T, test=F, fix=F)
+effects <- setEffect(effects, altX, name="net", interaction1="depsUpLogVar",
+                     include=T, test=F, fix=F)
+
+effects <- setEffect(effects, altX, name="net", interaction1="comIntLogVar",
+                     include=T, test=F, fix=F)
+effects <- setEffect(effects, outActX, name="net", interaction1="comIntLogVar",
+                     include=F, test=F, fix=F)
+
+
+effects <- setEffect(effects, altXOutAct, name="net", interaction1="depsUpLogVar",
+                     include=F, test=F, fix=F)
+effects <- setEffect(effects, altXOutAct, name="net", interaction1="depsDownLogVar",
+                     include=F, test=F, fix=F)
+
+
+ans.model3b <- siena07(algorithm, data=data, effects=effects,
+                      batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                      nbrNodes=12)
+wald3b <- Multipar.RSiena(ans.model3b, c(8:ans.model3b$pp))
+gof.string3b <- sprintf("%.2f (%d)", wald3b$chisquare, wald3b$df)
+
+outTable(ans.model3b)
+texreg::htmlreg(list(ans.model0, ans.model1, ans.model2b, ans.model3b),
+                stars = c(0.05, 0.01, 0.001),
+                single.row = TRUE, include.iterations = FALSE,
+                custom.gof.rows = list(
+                  "Wald Statistics" = c(gof.string0, gof.string1, gof.string2b, gof.string3b)),
+                file = 'tables/model3b.html')
+saveRDS(ans.model3b, file = "models/model3b.rds")
+# ans.model3b <- readRDS("models/model3b.rds")
+```
+
+```{r}
+gof.id.3b <- sienaGOF(ans.model3b, verbose=TRUE, varName="net",
+                   IndegreeDistribution, join=T, cumulative=F)
+plot(gof.id.3b, violin=T)
+
+gof.od.3b <- sienaGOF(ans.model3b, verbose=TRUE, varName="net",
+                   OutdegreeDistribution, join=T, cumulative=F)
+plot(gof.od.3b)
+```
+
+
+```{r}
+effects <- setEffect(effects, inPopSqrt, name="net", include=T, test=F, fix=F)
+effects <- setEffect(effects, cycle4, name="net", include=F, test=F, fix=F)
+
+effects <- setEffect(effects, inPop, name="net", include=F, test=F, fix=F)
+effects <- setEffect(effects, outTrunc, name="net", include=F, test=F, fix=F)
+effects <- setEffect(effects, outIso, name="net", include=F, test=F, fix=F)
+
+
+# effects <- includeTimeDummy(effects, cycle4, timeDummy = "all", include=F)
+
+# Not good, makes model fit poor, GOF outdegree bad, Wald bad
+effects <- setEffect(effects, homXOutAct, name="net", interaction1="depsUpLogVar",
+                     include=F, test=F, fix=F)
+effects <- setEffect(effects, homXOutAct, name="net", interaction1="depsDownLogVar",
+                     include=F, test=F, fix=F)
+
+# GOOD! Improves Wald score and GOF p-values
+effects <- setEffect(effects, outActX, name="net", interaction1="depsUpLogVar",
+                     include=T, test=F, fix=F)
+effects <- setEffect(effects, outActX, name="net", interaction1="depsDownLogVar",
+                     include=T, test=F, fix=F)
+
+# Should also be included
+effects <- setEffect(effects, altX, name="net", interaction1="depsDownLogVar",
+                     include=T, test=F, fix=F)
+effects <- setEffect(effects, altX, name="net", interaction1="depsUpLogVar",
+                     include=T, test=F, fix=F)
+
+# Don't include
+effects <- setEffect(effects, altXOutAct, name="net", interaction1="depsUpLogVar",
+                     include=F, test=F, fix=F)
+effects <- setEffect(effects, altXOutAct, name="net", interaction1="depsDownLogVar",
+                     include=F, test=F, fix=F)
+
+# Try more effects
+# Nope
+effects <- setEffect(effects, sameXCycle4, name="net", interaction1="devActLogVar",
+                     include=F, test=F, fix=F)
+# Nope!!!
+effects <- setEffect(effects, inPopX, name="net", interaction1="devActLogVar",
+                     include=F, test=F, fix=F)
+
+# Not that good right now, might become better later
+effects <- setEffect(effects, sameWXClosure, name="net", interaction1="net", interaction2="devActLogVar",
+                     include=F, test=F, fix=F)
+
+# Nope
+effects <- setEffect(effects, diffXInPop, name="net", interaction1="devActLogVar",
+                     include=F, test=F, fix=F)
+
+# Not so much worse
+effects <- setEffect(effects, sameXInPop, name="net", interaction1="devActLogVar",
+                     include=F, test=F, fix=F)
+
+# Back to Exogenous
+# Both make the model's wald statistic way worse
+effects <- setEffect(effects, outInv, name="net", include=F, test=F, fix=F)
+effects <- setEffect(effects, outSqInv, name="net", include=F, test=F, fix=F)
+
+effects <- setEffect(effects, in2Plus, name="net", include=F, test=F, fix=F)
+effects <- setEffect(effects, in3Plus, name="net", include=F, test=F, fix=F)
+
+effects <- setEffect(effects, antiInIso, name="net", include=F, test=F, fix=F)
+effects <- setEffect(effects, antiInIso2, name="net", include=F, test=F, fix=F)
+
+effects <- setEffect(effects, cycle4, name="net", include=F, test=F, fix=F)
+effects <- setEffect(effects, sameXCycle4, name="net", interaction1="devActLogVar",
+                     include=F, test=F, fix=F)
+
+effects <- setEffect(effects, altSqX, name="net", interaction1="ageLogVar",
+                     include=F, test=F, fix=F)
+
+effects <- setEffect(effects, outAct, name="net", include=F, test=F, fix=F)
+effects <- setEffect(effects, outActX, name="net", interaction1="ageLogVar",
+                     include=F, test=F, fix=F)
+# Try when altX effect is removed and only outActX kept for age
+effects <- setEffect(effects, altX, name="net", interaction1="ageLogVar",
+                     include=T, test=F, fix=F)
+
+effects <- setEffect(effects, outActX, name="net", interaction1="comIntLogVar",
+                     include=F, test=F, fix=F)
+effects <- setEffect(effects, homXOutAct, name="net", interaction1="comIntLogVar",
+                     include=F, test=F, fix=F)
+effects <- setEffect(effects, outAct, name="net", include=F, test=F, fix=F)
+effects <- setEffect(effects, outInAss, name="net", include=F, test=F, fix=F) 
+
+effects <- setEffect(effects, outActX, name="net", interaction1="relActLogVar",
+                     include=F, test=F, fix=F)
+
+ans.model4b <- siena07(algorithm, data=data, effects=effects,
+                      batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                      nbrNodes=12)
+wald4b <- Multipar.RSiena(ans.model4b, c(8:ans.model4b$pp))
+gof.string4b <- sprintf("%.2f (%d)", wald4b$chisquare, wald4b$df)
+
+outTable(ans.model4b)
+texreg::htmlreg(list(ans.model0, ans.model1, ans.model2b, ans.model3b, ans.model4b),
+                stars = c(0.05, 0.01, 0.001),
+                single.row = TRUE, include.iterations = FALSE,
+                custom.gof.rows = list(
+                  "Wald Statistics" = c(gof.string0, gof.string1, gof.string2b, gof.string3b, gof.string4b)),
+                file = 'tables/model4b.html')
+saveRDS(ans.model4b, file = "models/model4b.rds")
+# ans.model4b <- readRDS("models/model4b.rds")
+```
+
+```{r}
+gof.id.4b <- sienaGOF(ans.model4b, verbose=TRUE, varName="net",
+                   IndegreeDistribution, join=T, cumulative=F)
+plot(gof.id.4b, violin=T)
+
+gof.od.4b <- sienaGOF(ans.model4b, verbose=TRUE, varName="net",
+                   OutdegreeDistribution, join=T, cumulative=F)
+plot(gof.od.4b)
 ```
 
 ```{r}
@@ -601,11 +1408,11 @@ plot(gof.od)
 ### Preliminary GOF Tests
 
 ```{r}
-gof.id <- sienaGOF(ans.model8, verbose=TRUE, varName="net",
+gof.id <- sienaGOF(ans.model2b, verbose=TRUE, varName="net",
                    IndegreeDistribution, join=T, cumulative=F)
 plot(gof.id, violin=T)
 
-gof.od <- sienaGOF(ans.model8, verbose=TRUE, varName="net",
+gof.od <- sienaGOF(ans.model2b, verbose=TRUE, varName="net",
                    OutdegreeDistribution, join=T, cumulative=F)
 plot(gof.od)
 ```
@@ -624,10 +1431,10 @@ Multipar.RSiena(ans.model1, 8, 9, 11, 12)
 
 ```{r}
 # TODO Check and what does it mean?
-tt <- sienaTimeTest(ans.model1)
+tt <- sienaTimeTest(ans.model5)
 
 summary(tt)
-plot(tt, pairwise=TRUE)
+# plot(tt, pairwise=TRUE)
 plot(tt)
 ```
 

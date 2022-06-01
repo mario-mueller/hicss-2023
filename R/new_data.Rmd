@@ -711,11 +711,19 @@ effects.fix <- effects
 # effects.fix <- setEffect(effects.fix, outRateLog, name="net", type="rate",
 #                          fix=F, test=F, include=T)
 
-effects.fix <- setEffect(effects.fix, outRate, name="net", type="rate",
-                         fix=F, test=F, include=T)
+# Nope!
+# effects.fix <- setEffect(effects.fix, outRate, name="net", type="rate",
+#                          fix=F, test=F, include=T)
+
 # effects.fix <- setEffect(effects.fix, RateX, name="net", type="rate",
 #                          interaction1="devActLogVar",
-#                          fix=F, test=F, include=T)
+#                         fix=F, test=F, include=T)
+# Good, but quite there yet
+# effects.fix <- setEffect(effects.fix, outAct, fix=F, test=F, include=T)
+# Gets better...
+
+effects.fix <- setEffect(effects.fix, outInAss, fix=F, test=F, include=T)
+
 
 model4 <- siena07(algorithm, data=data, effects=effects.fix,
                   batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
@@ -737,16 +745,19 @@ plot(gof.od.fix)
 wald1 <- Multipar.RSiena(model1, c(4:model1$pp))
 wald2 <- Multipar.RSiena(model2, c(4:model2$pp))
 wald3 <- Multipar.RSiena(model3, c(4:model3$pp))
+wald4 <- Multipar.RSiena(model4, c(4:model4$pp))
 
 gof.string1 <- sprintf("%.2f (%d)", wald1$chisquare, wald1$df)
 gof.string2 <- sprintf("%.2f (%d)", wald2$chisquare, wald2$df)
 gof.string3 <- sprintf("%.2f (%d)", wald3$chisquare, wald3$df)
+gof.string4 <- sprintf("%.2f (%d)", wald4$chisquare, wald4$df)
 
-texreg::htmlreg(list(model1, model2, model3),
+texreg::htmlreg(list(model1, model2, model3, model4),
                 stars = c(0.1, 0.05, 0.01, 0.001),
                 single.row = TRUE, include.iterations = FALSE,
                 custom.gof.rows = list(
-                  "Wald Statistics" = c(gof.string1, gof.string2, gof.string3)),
+                  "Wald Statistics" = c(gof.string1, gof.string2,
+                                        gof.string3, gof.string4)),
                 file = 'tables/results.html')
 ```
 

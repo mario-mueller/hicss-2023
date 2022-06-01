@@ -188,28 +188,159 @@ depDownDyad  <- varDyadCovar(depDownArray, nodeSets = c("devs", "pkgs"), type = 
 
 ## Initialization
 
-- TODO: Currently, without composition change!
+TODO: Add composition change after data accounts properly for joiners
 
 ```{r}
-data <- sienaDataCreate(net, devActLogVar,
-                        depsUpLogVar, depsDownLogVar, comIntLogVar, relActLogVar, ageLogVar,
-                        depUpDyad, depDownDyad,
+data <- sienaDataCreate(net, comp,
+                        devActLogVar, comIntLogVar, relActLogVar, ageLogVar,
+                        depsUpLogVar, depsDownLogVar, depUpDyad, depDownDyad,
                         nodeSets = list(devs, pkgs))
-# saveRDS(data, "data/sienaData_new.rds")
-print01Report(data, modelname='hicss-2023-new')
+saveRDS(data, "data/sienaData.rds")
+print01Report(data, modelname='hicss-2023-final')
 ```
 
-# Model Forward-Selection
+# Selected Models
 
 ## Initialize Algorithm
 
 ```{r}
-algorithm <- sienaAlgorithmCreate(projname='hicss-2023-new',
+algorithm <- sienaAlgorithmCreate(projname='hicss-2023-final',
                                   seed=17,
                                   n3=3000) # 1000 standard, 3000 for pub
 effects <- getEffects(data, nintn = 50)
 effectsDocumentation(effects)
 ```
+
+## Model 1: Endogenous
+
+```{r}
+effects <- getEffects(data, nintn = 50)
+
+effects <- setEffect(effects, inPopSqrt, fix=F, test=F, include=T)
+effects <- setEffect(effects, outTrunc, parameter=2, fix=F, test=F, include=T)
+effects <- setEffect(effects, outIso, fix=F, test=F, include=T)
+effects <- setEffect(effects, antiInIso, fix=F, test=F, include=T)
+effects <- setEffect(effects, in2Plus, fix=F, test=F, include=T)
+effects <- setEffect(effects, in3Plus, fix=F, test=F, include=T)
+
+model1 <- siena07(algorithm, data=data, effects=effects,
+                  batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                  byWave=T, nbrNodes=12)
+saveRDS(model1, "models/model1.rds")
+siena.table(model1, type="html", file="tables/results_model1.html",
+            sig=T)
+```
+
+
+## Model 2: Controls
+
+```{r}
+effects <- setEffect(effects, egoX, name="net", interaction1="devActLogVar",
+                     fix=F, test=F, include=T)
+effects <- setEffect(effects, altX, name="net", interaction1="comIntLogVar",
+                     fix=F, test=F, include=T)
+effects <- setEffect(effects, altX, name="net", interaction1="relActLogVar",
+                     fix=F, test=F, include=T)
+effects <- setEffect(effects, altX, name="net", interaction1="ageLogVar",
+                     fix=F, test=F, include=T)
+
+model2 <- siena07(algorithm, data=data, effects=effects,
+                  batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                  byWave=T, nbrNodes=12)
+saveRDS(model2, "models/model2.rds")
+
+siena.table(model2, type="html", file="tables/results_model2.html",
+            sig=T)
+```
+
+
+## Model 3: Full
+
+```{r}
+effects <- setEffect(effects, altX, name="net", interaction1="depsUpLogVar",
+                     fix=F, test=F, include=T)
+effects <- setEffect(effects, altX, name="net", interaction1="depsDownLogVar",
+                     fix=F, test=F, include=T)
+effects <- setEffect(effects, X, name="net", interaction1="depUpDyad",
+                     fix=F, test=F, include=T)
+effects <- setEffect(effects, X, name="net", interaction1="depDownDyad",
+                     fix=F, test=F, include=T)
+
+model3 <- siena07(algorithm, data=data, effects=effects,
+                  batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                  byWave=T, nbrNodes=12)
+saveRDS(model3, "models/model3.rds")
+siena.table(model3, type="html", file="tables/results_model3.html",
+            sig=T)
+
+```
+
+## Results Table
+
+```{r}
+wald1 <- Multipar.RSiena(model1, c(1:model1$pp))
+wald2 <- Multipar.RSiena(model2, c(1:model2$pp))
+wald3 <- Multipar.RSiena(model3, c(1:model3$pp))
+
+gof.string1 <- sprintf("%.2f (%d)", wald1$chisquare, wald1$df)
+gof.string2 <- sprintf("%.2f (%d)", wald2$chisquare, wald2$df)
+gof.string3 <- sprintf("%.2f (%d)", wald3$chisquare, wald3$df)
+
+texreg::htmlreg(list(model1, model2, model3),
+                stars = c(0.1, 0.05, 0.01, 0.001),
+                single.row = TRUE, include.iterations = FALSE,
+                custom.gof.rows = list(
+                  "Wald Statistics" = c(gof.string1, gof.string2, gof.string3)),
+                file = 'tables/results.html')
+```
+
+## Goodness of Fit
+
+```{r}
+gof.id.full <- sienaGOF(model3, verbose=TRUE, varName="net",
+                        IndegreeDistribution, join=T, cumulative=F)
+plot(gof.id.full)
+
+gof.od.full <- sienaGOF(model3, verbose=TRUE, varName="net",
+                        OutdegreeDistribution, join=T, cumulative=F)
+plot(gof.od.full)
+```
+
+## Model 4: Test with outRate
+
+```{r}
+effects.fix <- effects
+
+effects.fix <- setEffect(effects.fix, outRate, name="net", type="rate",
+                         fix=F, test=F, include=T)
+effects.fix <- setEffect(effects.fix, RateX, name="net", type="rate",
+                         interaction1="devActLogVar", fix=F, test=F, include=F)
+effects.fix <- setEffect(effects.fix, outAct, fix=F, test=F, include=F)
+
+model4 <- siena07(algorithm, data=data, effects=effects.fix,
+                  batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                  byWave=T, nbrNodes=12)
+
+wald4 <- Multipar.RSiena(model4, c(1:model4$pp))
+gof.string4 <- sprintf("%.2f (%d)", wald4$chisquare, wald4$df)
+
+texreg::htmlreg(list(model1, model2, model3, model4),
+                stars = c(0.1, 0.05, 0.01, 0.001),
+                single.row = TRUE, include.iterations = FALSE,
+                custom.gof.rows = list(
+                  "Wald Statistics" = c(gof.string1, gof.string2, gof.string3, gof.string4)),
+                file = 'tables/results.html')
+
+gof.id.fix <- sienaGOF(model4, verbose=TRUE, varName="net",
+                        IndegreeDistribution, join=T, cumulative=F)
+plot(gof.id.fix)
+
+gof.od.fix <- sienaGOF(model4, verbose=TRUE, varName="net",
+                        OutdegreeDistribution, join=T, cumulative=F)
+plot(gof.od.fix)
+```
+
+# Model Forward-Selection
 
 ## Model 1
 
@@ -620,15 +751,4 @@ plot(gof.id10)
 gof.od10 <- sienaGOF(ans.model10, verbose=TRUE, varName="net",
                      OutdegreeDistribution, join=T, cumulative=F)
 plot(gof.od10)
-```
-
-# Plot Simulated Models
-
-```{r}
-sim <- ans.model10$sims[[400]][[1]][[1]][[3]]
-
-g.layout <- gplot(sim, usearrows=T)
-par(mfrow=c(1,1))
-gplot(sim, gmode="twomode",
-      arrowhead.cex=.75, edge.col='gray70', coord=g.layout, vertex.cex=1.5)
 ```

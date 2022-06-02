@@ -445,6 +445,42 @@ model4.stt <- siena07(algorithm, data=data, effects=effects4,
 summary(model4.stt)
 ```
 
+Still super significant. Add in the next step.
+
+```{r}
+effects4 <- effects3
+
+effects4 <- setEffect(effects4, egoX, name="net", interaction1="devActLogVar",
+                      fix=F, test=F, include=T)
+
+model4 <- siena07(algorithm, data=data, effects=effects4,
+                  batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                  byWave=T, nbrNodes=12)
+summary(model4)
+
+# Wald-type test
+wald4 <- Multipar.RSiena(model4, c(4:model4$pp))
+
+siena.table(model4, sig=T, type="html", file="tables/results_model4_final.html")
+saveRDS(model4, "models/model4_final.rds")
+```
+
+Maximum convergence ratio 0.08 and all convergence t-ratios < 0.06.
+Wald-type statistics improves drastically (chi-squared = 3757.83, d.f. = 7;  p < 0.001)
+Correlations between estimates also improves.
+
+```{r}
+gof.id4 <- sienaGOF(model4, varName="net", IndegreeDistribution,
+                    join=T, cumulative=F, verbose=T)
+plot(gof.id4)
+
+gof.od4 <- sienaGOF(model4, varName="net", OutdegreeDistribution,
+                    join=T, cumulative=F, verbose=T)
+plot(gof.od4)
+```
+
+In-degree distribution slightly worse from p = 0.179 to p = 0.141.
+Out-degree distribution better p = 0.013, but still not quite there yet.
 
 # Results
 
@@ -452,13 +488,14 @@ summary(model4.stt)
 gof.string1 <- sprintf("%.2f (%d)", wald1$chisquare, wald1$df)
 gof.string2 <- sprintf("%.2f (%d)", wald2$chisquare, wald2$df)
 gof.string3 <- sprintf("%.2f (%d)", wald3$chisquare, wald3$df)
+gof.string4 <- sprintf("%.2f (%d)", wald4$chisquare, wald4$df)
 
-texreg::htmlreg(list(model1, model2, model3),
+texreg::htmlreg(list(model1, model2, model3, model4),
                 stars = c(0.1, 0.05, 0.01, 0.001),
                 single.row = TRUE, include.iterations = FALSE,
                 custom.gof.rows = list(
                   "Wald Statistics" = c(
-                    gof.string1, gof.string2, gof.string3)),
+                    gof.string1, gof.string2, gof.string3, gof.string4)),
                 file = 'tables/results_final.html')
 ```
 

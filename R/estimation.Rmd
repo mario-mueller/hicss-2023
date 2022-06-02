@@ -194,6 +194,7 @@ data <- sienaDataCreate(net, comp,
                         depsUpLogVar, depsDownLogVar, depUpDyad, depDownDyad,
                         nodeSets = list(devs, pkgs))
 saveRDS(data, "data/sienaData.rds")
+data <- readRDS("data/sienaData.rds")
 print01Report(data, modelname='hicss-2023-final')
 ```
 
@@ -227,7 +228,7 @@ effects1 <- setEffect(effects1, inPopSqrt,
 
 model1.stt <- siena07(algorithm, data=data, effects=effects1,
                       batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
-                      byWave=T, nbrNodes=4)
+                      byWave=T, nbrNodes=12)
 summary(model1.stt)
 ```
 
@@ -245,7 +246,7 @@ effects1 <- setEffect(effects1, inPopSqrt,
 
 model1 <- siena07(algorithm, data=data, effects=effects1,
                   batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
-                  byWave=T, nbrNodes=4)
+                  byWave=T, nbrNodes=12)
 summary(model1)
 
 # Wald-type test
@@ -297,7 +298,7 @@ effects2 <- setEffect(effects2, altX, name="net", interaction1="ageLogVar",
 
 model2.stt <- siena07(algorithm, data=data, effects=effects2,
                       batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
-                      byWave=T, nbrNodes=4)
+                      byWave=T, nbrNodes=12)
 summary(model2.stt)
 ```
 
@@ -320,7 +321,7 @@ effects2 <- setEffect(effects2, X, name="net", interaction1="depDownDyad",
 
 model2.stt <- siena07(algorithm, data=data, effects=effects2,
                       batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
-                      byWave=T, nbrNodes=4)
+                      byWave=T, nbrNodes=12)
 summary(model2.stt)
 ```
 
@@ -338,7 +339,7 @@ effects2 <- setEffect(effects2, X, name="net", interaction1="depDownDyad",
 
 model2 <- siena07(algorithm, data=data, effects=effects2,
                   batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
-                  byWave=T, nbrNodes=4)
+                  byWave=T, nbrNodes=12)
 summary(model2)
 
 # Wald-type test
@@ -382,7 +383,7 @@ effects3 <- setEffect(effects3, antiInIso2, fix=F, test=F, include=F)
 
 model3.stt <- siena07(algorithm, data=data, effects=effects3,
                       batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
-                      byWave=T, nbrNodes=4)
+                      byWave=T, nbrNodes=12)
 summary(model3.stt)
 ```
 
@@ -400,7 +401,7 @@ effects3 <- setEffect(effects3, cycle4, fix=F, test=F, include=T)
 
 model3 <- siena07(algorithm, data=data, effects=effects3,
                   batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
-                  byWave=T, nbrNodes=4)
+                  byWave=T, nbrNodes=12)
 summary(model3)
 
 # Wald-type test
@@ -410,7 +411,9 @@ siena.table(model3, sig=T, type="html", file="tables/results_model3_final.html")
 saveRDS(model3, "models/model3_final.rds")
 ```
 
-# CONTINUE
+Maximum convergence ratio is better (0.074) and all convergence t-ratios < 0.05.
+Wald-type statistics improves (chi-squared = 2476.59, d.f. = 6;  p < 0.001).
+Correlations between estimates basically unchanged.
 
 ```{r}
 gof.id3 <- sienaGOF(model3, varName="net", IndegreeDistribution,
@@ -421,6 +424,27 @@ gof.od3 <- sienaGOF(model3, varName="net", OutdegreeDistribution,
                     join=T, cumulative=F, verbose=T)
 plot(gof.od3)
 ```
+
+In-degree distribution improves from p = 0.169 to p = 0.179.
+Out-degree distribution still bad... (p = 0)
+
+## Model 4
+
+Let's test control variables again. Add developer activity first, since this
+has been shown to be significant before.
+
+```{r}
+effects4 <- effects3
+
+effects4 <- setEffect(effects4, egoX, name="net", interaction1="devActLogVar",
+                      fix=T, test=T, include=T)
+
+model4.stt <- siena07(algorithm, data=data, effects=effects4,
+                      batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                      byWave=T, nbrNodes=12)
+summary(model4.stt)
+```
+
 
 # Results
 

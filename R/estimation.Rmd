@@ -186,6 +186,22 @@ depDownArray <- array(c(depDown1, depDown2, depDown3),
 depDownDyad  <- varDyadCovar(depDownArray, nodeSets = c("devs", "pkgs"), type = "bipartite")
 ```
 
+### Collaboration Owner
+
+```{r}
+# Collaboration with same Owner
+collab1 <- as.matrix(read.table('data/dyadic/collaborations-2021-02-01.txt'))
+collab2 <- as.matrix(read.table('data/dyadic/collaborations-2021-03-01.txt'))
+collab3 <- as.matrix(read.table('data/dyadic/collaborations-2021-04-01.txt'))
+
+# Create network object
+collabList  <- list(depDown1, depDown2, depDown3)
+collabArray <- array(c(depDown1, depDown2, depDown3),
+                     dim=c(num_devs, num_pkgs, length(depDownList)))
+collabDyad  <- varDyadCovar(depDownArray, nodeSets = c("devs", "pkgs"), type = "bipartite")
+```
+
+
 ## Initialization
 
 ```{r}
@@ -482,6 +498,76 @@ plot(gof.od4)
 In-degree distribution slightly worse from p = 0.179 to p = 0.141.
 Out-degree distribution better p = 0.013, but still not quite there yet.
 
+## Model 5
+
+```{r}
+effects5 <- effects4
+
+effects5 <- setEffect(effects5, altX, name="net", interaction1="comIntLogVar",
+                      fix=F, test=F, include=T)
+effects5 <- setEffect(effects5, altX, name="net", interaction1="relActLogVar",
+                      fix=F, test=F, include=T)
+effects5 <- setEffect(effects5, altX, name="net", interaction1="ageLogVar",
+                      fix=F, test=F, include=T)
+
+model5 <- siena07(algorithm, data=data, effects=effects5,
+                  batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                  byWave=T, nbrNodes=12)
+summary(model5)
+
+wald5 <- Multipar.RSiena(model5, c(4:model5$pp))
+
+siena.table(model5, sig=T, type="html", file="tables/results_model5_final.html")
+saveRDS(model5, "models/model5_final.rds")
+```
+
+```{r}
+gof.id5 <- sienaGOF(model5, varName="net", IndegreeDistribution,
+                    join=T, cumulative=F, verbose=T)
+plot(gof.id5)
+
+gof.od5 <- sienaGOF(model5, varName="net", OutdegreeDistribution,
+                    join=T, cumulative=F, verbose=T)
+plot(gof.od5)
+```
+
+In-degree distribution improves to p = 0.344.
+Out-degree distribution p = 0.011, but still not quite there yet.
+
+## Model 6
+
+```{r}
+effects6 <- effects5
+
+effects6 <- setEffect(effects6, altX, name="net", interaction1="depsUpLogVar",
+                      fix=F, test=F, include=T)
+effects6 <- setEffect(effects6, altX, name="net", interaction1="depsDownLogVar",
+                      fix=F, test=F, include=T)
+
+# effects6 <- setEffect(effects6, outActSqrt, fix=F, test=F, include=T)
+# effects6 <- setEffect(effects6, outTrunc, parameter=2, fix=F, test=F, include=F)
+
+model6 <- siena07(algorithm, data=data, effects=effects6,
+                  batch=F, verbose=F, returnDeps=T, initC=T, useCluster=T,
+                  byWave=T, nbrNodes=12)
+summary(model6)
+
+wald6 <- Multipar.RSiena(model6, c(4:model6$pp))
+
+siena.table(model6, sig=T, type="html", file="tables/results_model6_final.html")
+saveRDS(model6, "models/model6_final.rds")
+```
+
+```{r}
+gof.id6 <- sienaGOF(model6, varName="net", IndegreeDistribution,
+                    join=T, cumulative=F, verbose=T)
+plot(gof.id6)
+
+gof.od6 <- sienaGOF(model6, varName="net", OutdegreeDistribution,
+                    join=T, cumulative=F, verbose=T)
+plot(gof.od6)
+```
+
 # Results
 
 ```{r}
@@ -489,13 +575,16 @@ gof.string1 <- sprintf("%.2f (%d)", wald1$chisquare, wald1$df)
 gof.string2 <- sprintf("%.2f (%d)", wald2$chisquare, wald2$df)
 gof.string3 <- sprintf("%.2f (%d)", wald3$chisquare, wald3$df)
 gof.string4 <- sprintf("%.2f (%d)", wald4$chisquare, wald4$df)
+gof.string5 <- sprintf("%.2f (%d)", wald5$chisquare, wald5$df)
+gof.string6 <- sprintf("%.2f (%d)", wald6$chisquare, wald6$df)
 
-texreg::htmlreg(list(model1, model2, model3, model4),
+texreg::htmlreg(list(model1, model2, model3, model4, model5, model6),
                 stars = c(0.1, 0.05, 0.01, 0.001),
                 single.row = TRUE, include.iterations = FALSE,
                 custom.gof.rows = list(
                   "Wald Statistics" = c(
-                    gof.string1, gof.string2, gof.string3, gof.string4)),
+                    gof.string1, gof.string2, gof.string3, gof.string4,
+                    gof.string5, gof.string6)),
                 file = 'tables/results_final.html')
 ```
 

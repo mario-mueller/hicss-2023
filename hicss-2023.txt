@@ -6,7 +6,7 @@ Filename is hicss-2023.txt.
 
 This file contains primary output for SIENA project <<hicss-2023>>.
 
-Date and time: 03/06/2022 17:18:00 
+Date and time: 03/06/2022 19:13:34 
 
 RSiena version 1.3.0.1 (02 05 2021)
 
@@ -2346,3 +2346,1163 @@ constant net rate (period 3)            1.0095
 outdegree (density)                               -1.5450 
 
 Initialisation of project <<hicss-2023>> executed succesfully.
+
+
+-----------------------------------
+New Analysis started.
+Date and time: 03/06/2022 19:13:35
+New results follow.
+-----------------------------------
+
+RSiena version 1.3.0.1 (02 Mai 21)
+
+
+@1
+Estimation by stochastic approximation algorithm.
+=================================================
+
+Current random number seed is 17.
+Effects object used: effects 
+
+NB. Request for conditional estimation has been over-ridden.
+
+Estimation method: unconditional moment estimation
+.
+
+Time duration for simulations in each period is 1.0.
+Changing composition.
+Joiners/leavers option: 1
+Standard errors are estimated with the likelihood ratio method.
+Dolby method (regression on scores) is used.
+Initial value of gain parameter is  0.6928203.
+Reduction factor for gain parameter is  0.5000000.
+Number of subphases in Phase 2 is 4.
+
+Initial parameter values are 
+  1. rate:  constant net rate (period 1)                    1.3198
+  2. rate:  constant net rate (period 2)                    1.1534
+  3. rate:  constant net rate (period 3)                    1.0095
+  4. eval:  outdegree (density)                            -1.5450
+
+
+Observed values of target statistics are
+  1. Amount of network change in period 1                               413.0000
+  2. Amount of network change in period 2                               512.0000
+  3. Amount of network change in period 3                               540.0000
+  4. Number of ties                                                    1754.0000
+
+ 4 parameters, 4 statistics
+
+Estimation of derivatives by the LR method (type 1).
+
+
+@2
+End of stochastic approximation algorithm, phase 3.
+---------------------------------------------------
+
+Total of 4002 iterations.
+Parameter estimates based on 1002 iterations,
+convergence diagnostics, covariance and derivative matrices based on 3000 iterations.
+
+Information for convergence diagnosis.
+Averages, standard deviations, and t-ratios for deviations from targets:
+  1.  -0.4167  17.7636  -0.0235 
+  2.  -0.5057  19.6831  -0.0257 
+  3.   1.6673  20.2605   0.0823 
+  4.   0.7683  28.2976   0.0272 
+
+Good convergence is indicated by the t-ratios being close to zero.
+
+Overall maximum convergence ratio =  0.0912 .
+
+
+
+@2
+Estimation Results.
+-------------------
+
+Regular end of estimation algorithm.
+Total of 4002 iteration steps.
+
+
+@3
+Estimates and standard errors
+                             
+ 1. rate:  constant net rate (period 1)                            0.7709  (   0.0404)
+ 2. rate:  constant net rate (period 2)                            0.7567  (   0.0364)
+ 3. rate:  constant net rate (period 3)                            0.7061  (   0.0352)
+ 4. eval:  outdegree (density)                                    -4.2385  (   0.1057)
+
+
+@3
+Covariance matrices
+                   
+Covariance matrix of estimates (correlations below diagonal):
+     0.002      0.000      0.000      0.000
+     0.001      0.001      0.000      0.000
+    -0.025     -0.009      0.001      0.000
+    -0.025     -0.092     -0.097      0.011
+
+Derivative matrix of expected statistics X by parameters and
+covariance/correlation matrix of X can be found using
+summary(ans) within R, or by using the 'verbose' option in Siena07.
+ 
+Total computation time 135.1 seconds.
+
+
+-----------------------------------
+New Analysis started.
+Date and time: 03/06/2022 19:15:53
+New results follow.
+-----------------------------------
+
+RSiena version 1.3.0.1 (02 Mai 21)
+
+
+@1
+Estimation by stochastic approximation algorithm.
+=================================================
+
+Current random number seed is 17.
+Effects object used: effects1 
+
+NB. Request for conditional estimation has been over-ridden.
+
+Estimation method: unconditional moment estimation
+.
+
+Time duration for simulations in each period is 1.0.
+Changing composition.
+Joiners/leavers option: 1
+Standard errors are estimated with the likelihood ratio method.
+Dolby method (regression on scores) is used.
+Initial value of gain parameter is  0.6928203.
+Reduction factor for gain parameter is  0.5000000.
+Number of subphases in Phase 2 is 4.
+
+Initial parameter values are 
+  1. rate:  constant net rate (period 1)                    1.3198
+  2. rate:  constant net rate (period 2)                    1.1534
+  3. rate:  constant net rate (period 3)                    1.0095
+  4. rate:  effect devActLogVar on rate                     0.0000  (fixed) 
+  5. eval:  outdegree (density)                            -1.5450
+  6. eval:  4-cycles (1)                                    0.0000  (fixed) 
+  7. eval:  indegree - popularity                           0.0000  (fixed) 
+  8. eval:  outdegree - activity                            0.0000  (fixed) 
+
+
+Observed values of target statistics are
+  1. Amount of network change in period 1                               413.0000
+  2. Amount of network change in period 2                               512.0000
+  3. Amount of network change in period 3                               540.0000
+  4. Amount of change x devActLogVar                                   1347.7839
+  5. Number of ties                                                    1754.0000
+  6. (Number 4-cycles)^1/1)                                              84.0000
+  7. Sum of squared indegrees                                          20874.0000
+  8. Sum of squared outdegrees                                         2908.0000
+
+ 8 parameters, 8 statistics
+
+Estimation of derivatives by the LR method (type 1).
+
+
+@2
+End of stochastic approximation algorithm, phase 3.
+---------------------------------------------------
+
+Total of 4002 iterations.
+Parameter estimates based on 1002 iterations,
+convergence diagnostics, covariance and derivative matrices based on 3000 iterations.
+
+Information for convergence diagnosis.
+Averages, standard deviations, and t-ratios for deviations from targets:
+  1.    -0.4167  17.7636  -0.0235                      
+  2.    -0.5057  19.6831  -0.0257                      
+  3.     1.6673  20.2605   0.0823                      
+  4.  -356.8736  62.3584  -5.7229     (fixed parameter)
+  5.     0.7683  28.2976   0.0272                      
+  6.   -56.1437   6.1492  -9.1303     (fixed parameter)
+  7. -7012.3997 664.9884 -10.5451     (fixed parameter)
+  8.  -268.3083  59.2712  -4.5268     (fixed parameter)
+
+Good convergence is indicated by the t-ratios of non-fixed parameters being close to zero.
+
+Overall maximum convergence ratio =  0.0912 .
+
+
+
+@2
+Estimation Results.
+-------------------
+
+Regular end of estimation algorithm.
+Total of 4002 iteration steps.
+
+
+@3
+Estimates and standard errors
+                             
+ 1. rate:  constant net rate (period 1)                            0.7709  (   0.0404)
+ 2. rate:  constant net rate (period 2)                            0.7567  (   0.0364)
+ 3. rate:  constant net rate (period 3)                            0.7061  (   0.0352)
+ 4. rate:  effect devActLogVar on rate                             0.0000  (  fixed  )
+ 5. eval:  outdegree (density)                                    -4.2385  (   0.1057)
+ 6. eval:  4-cycles (1)                                            0.0000  (  fixed  )
+ 7. eval:  indegree - popularity                                   0.0000  (  fixed  )
+ 8. eval:  outdegree - activity                                    0.0000  (  fixed  )
+
+
+@3
+Covariance matrices
+                   
+(Values of the covariance matrix of estimates
+  are meaningless for the fixed parameters.)
+
+Covariance matrix of estimates (correlations below diagonal):
+     0.002      0.000      0.000         NA      0.000         NA         NA         NA
+     0.001      0.001      0.000         NA      0.000         NA         NA         NA
+    -0.025     -0.009      0.001         NA      0.000         NA         NA         NA
+        NA         NA         NA         NA         NA         NA         NA         NA
+    -0.025     -0.092     -0.097         NA      0.011         NA         NA         NA
+        NA         NA         NA         NA         NA         NA         NA         NA
+        NA         NA         NA         NA         NA         NA         NA         NA
+        NA         NA         NA         NA         NA         NA         NA         NA
+
+Derivative matrix of expected statistics X by parameters and
+covariance/correlation matrix of X can be found using
+summary(ans) within R, or by using the 'verbose' option in Siena07.
+ 
+
+@2
+Generalised score test <c>
+--------------------------
+
+Testing the goodness-of-fit of the model restricted by
+ (1)   rate:  effect devActLogVar on rate                 =   0.0000
+ (2)   eval:  4-cycles (1)                                =   0.0000
+ (3)   eval:  indegree - popularity                       =   0.0000
+ (4)   eval:  outdegree - activity                        =   0.0000
+_________________________________________________
+                   
+Joint test:
+-----------
+   c = 394.8373   d.f. = 4   p-value < 0.0001
+
+(1) tested separately:
+-----------------------
+ - two-sided:
+  c =  43.6062   d.f. = 1  p-value < 0.0001
+ - one-sided (normal variate):   6.6035
+
+(2) tested separately:
+-----------------------
+ - two-sided:
+  c =  87.1649   d.f. = 1  p-value < 0.0001
+ - one-sided (normal variate):   9.3362
+
+(3) tested separately:
+-----------------------
+ - two-sided:
+  c = 199.6097   d.f. = 1  p-value < 0.0001
+ - one-sided (normal variate):  14.1283
+
+(4) tested separately:
+-----------------------
+ - two-sided:
+  c =  51.6309   d.f. = 1  p-value < 0.0001
+ - one-sided (normal variate):   7.1855    
+_________________________________________________
+
+One-step estimates: 
+
+rate:  constant net rate (period 1)                 0.7637
+rate:  constant net rate (period 2)                 0.7825
+rate:  constant net rate (period 3)                 0.7649
+rate:  effect devActLogVar on rate                  0.0850
+eval:  outdegree (density)                         -8.1415
+eval:  4-cycles (1)                                 6.6150
+eval:  indegree - popularity                        0.1687
+eval:  outdegree - activity                         1.5962
+
+Total computation time 176.61 seconds.
+
+
+-----------------------------------
+New Analysis started.
+Date and time: 03/06/2022 19:18:54
+New results follow.
+-----------------------------------
+
+RSiena version 1.3.0.1 (02 Mai 21)
+
+
+@1
+Estimation by stochastic approximation algorithm.
+=================================================
+
+Current random number seed is 17.
+Effects object used: effects1 
+
+NB. Request for conditional estimation has been over-ridden.
+
+Estimation method: unconditional moment estimation
+.
+
+Time duration for simulations in each period is 1.0.
+Changing composition.
+Joiners/leavers option: 1
+Standard errors are estimated with the likelihood ratio method.
+Dolby method (regression on scores) is used.
+Initial value of gain parameter is  0.6928203.
+Reduction factor for gain parameter is  0.5000000.
+Number of subphases in Phase 2 is 4.
+
+Initial parameter values are 
+  1. rate:  constant net rate (period 1)                    1.3198
+  2. rate:  constant net rate (period 2)                    1.1534
+  3. rate:  constant net rate (period 3)                    1.0095
+  4. rate:  effect devActLogVar on rate                     0.0000
+  5. eval:  outdegree (density)                            -1.5450
+  6. eval:  4-cycles (1)                                    0.0000
+  7. eval:  indegree - popularity                           0.0000
+  8. eval:  outdegree - activity                            0.0000
+
+
+Observed values of target statistics are
+  1. Amount of network change in period 1                               413.0000
+  2. Amount of network change in period 2                               512.0000
+  3. Amount of network change in period 3                               540.0000
+  4. Amount of change x devActLogVar                                   1347.7839
+  5. Number of ties                                                    1754.0000
+  6. (Number 4-cycles)^1/1)                                              84.0000
+  7. Sum of squared indegrees                                          20874.0000
+  8. Sum of squared outdegrees                                         2908.0000
+
+ 8 parameters, 8 statistics
+
+Estimation of derivatives by the LR method (type 1).
+
+
+@2
+End of stochastic approximation algorithm, phase 3.
+---------------------------------------------------
+
+Total of 3889 iterations.
+Parameter estimates based on 889 iterations,
+convergence diagnostics, covariance and derivative matrices based on 3000 iterations.
+
+Information for convergence diagnosis.
+Averages, standard deviations, and t-ratios for deviations from targets:
+  1.   0.3917   17.3551   0.0226 
+  2.   0.8300   20.5976   0.0403 
+  3.   0.1097   20.4090   0.0054 
+  4.   0.5649   66.3021   0.0085 
+  5.   1.1993   36.6769   0.0327 
+  6.   9.7933  233.7783   0.0419 
+  7. 103.1280 3741.4903   0.0276 
+  8.   4.0753  106.4450   0.0383 
+
+Good convergence is indicated by the t-ratios being close to zero.
+
+Overall maximum convergence ratio =  0.0682 .
+
+
+
+@2
+Estimation Results.
+-------------------
+
+Regular end of estimation algorithm.
+Total of 3889 iteration steps.
+
+
+@3
+Estimates and standard errors
+                             
+ 1. rate:  constant net rate (period 1)                            0.7228  (   0.0410)
+ 2. rate:  constant net rate (period 2)                            0.7356  (   0.0370)
+ 3. rate:  constant net rate (period 3)                            0.7004  (   0.0355)
+ 4. rate:  effect devActLogVar on rate                             0.0970  (   0.0169)
+ 5. eval:  outdegree (density)                                    -5.2697  (   0.1421)
+ 6. eval:  4-cycles (1)                                            0.5000  (   0.3842)
+ 7. eval:  indegree - popularity                                   0.0514  (   0.0033)
+ 8. eval:  outdegree - activity                                    0.2702  (   0.0382)
+
+
+@3
+Covariance matrices
+                   
+Covariance matrix of estimates (correlations below diagonal):
+     0.002      0.000      0.000      0.000      0.000     -0.001      0.000      0.000
+     0.101      0.001      0.000      0.000     -0.001      0.000      0.000      0.000
+     0.125      0.147      0.001      0.000     -0.001      0.001      0.000      0.000
+    -0.329     -0.344     -0.327      0.000      0.000      0.000      0.000      0.000
+    -0.043     -0.142     -0.157      0.097      0.020      0.001      0.000     -0.004
+    -0.037      0.003      0.055      0.056      0.018      0.148      0.000     -0.007
+     0.034      0.116      0.092     -0.048     -0.571     -0.056      0.000      0.000
+     0.051      0.087      0.099     -0.093     -0.698     -0.444      0.203      0.001
+
+Derivative matrix of expected statistics X by parameters and
+covariance/correlation matrix of X can be found using
+summary(ans) within R, or by using the 'verbose' option in Siena07.
+ 
+Total computation time 164.33 seconds.
+
+
+-----------------------------------
+New Analysis started.
+Date and time: 03/06/2022 19:21:41
+New results follow.
+-----------------------------------
+
+RSiena version 1.3.0.1 (02 Mai 21)
+
+
+@1
+Estimation by stochastic approximation algorithm.
+=================================================
+
+Current random number seed is 17.
+Effects object used: effects2 
+
+NB. Request for conditional estimation has been over-ridden.
+
+Estimation method: unconditional moment estimation
+.
+
+Time duration for simulations in each period is 1.0.
+Changing composition.
+Joiners/leavers option: 1
+Standard errors are estimated with the likelihood ratio method.
+Dolby method (regression on scores) is used.
+Initial value of gain parameter is  0.6928203.
+Reduction factor for gain parameter is  0.5000000.
+Number of subphases in Phase 2 is 4.
+
+Initial parameter values are 
+  1. rate:  constant net rate (period 1)                    1.3198
+  2. rate:  constant net rate (period 2)                    1.1534
+  3. rate:  constant net rate (period 3)                    1.0095
+  4. rate:  effect devActLogVar on rate                     0.0000
+  5. eval:  outdegree (density)                            -1.5450
+  6. eval:  4-cycles (1)                                    0.0000
+  7. eval:  indegree - popularity                           0.0000
+  8. eval:  outdegree - activity                            0.0000
+  9. eval:  licenseVar alter                                0.0000  (fixed) 
+ 10. eval:  devActLogVar ego                                0.0000  (fixed) 
+ 11. eval:  comIntLogVar alter                              0.0000  (fixed) 
+ 12. eval:  relActLogVar alter                              0.0000  (fixed) 
+ 13. eval:  ageLogVar alter                                 0.0000  (fixed) 
+
+
+Observed values of target statistics are
+  1. Amount of network change in period 1                               413.0000
+  2. Amount of network change in period 2                               512.0000
+  3. Amount of network change in period 3                               540.0000
+  4. Amount of change x devActLogVar                                   1347.7839
+  5. Number of ties                                                    1754.0000
+  6. (Number 4-cycles)^1/1)                                              84.0000
+  7. Sum of squared indegrees                                          20874.0000
+  8. Sum of squared outdegrees                                         2908.0000
+  9. Sum of indegrees x licenseVar                                       -6.2097
+ 10. Sum of outdegrees x devActLogVar                                  2419.3892
+ 11. Sum of indegrees x comIntLogVar                                   2516.7282
+ 12. Sum of indegrees x relActLogVar                                    685.1799
+ 13. Sum of indegrees x ageLogVar                                        58.9602
+
+ 13 parameters, 13 statistics
+
+Estimation of derivatives by the LR method (type 1).
+
+
+@2
+End of stochastic approximation algorithm, phase 3.
+---------------------------------------------------
+
+Total of 3889 iterations.
+Parameter estimates based on 889 iterations,
+convergence diagnostics, covariance and derivative matrices based on 3000 iterations.
+
+Information for convergence diagnosis.
+Averages, standard deviations, and t-ratios for deviations from targets:
+  1.    0.3917   17.3551   0.0226                      
+  2.    0.8300   20.5976   0.0403                      
+  3.    0.1097   20.4090   0.0054                      
+  4.    0.5649   66.3021   0.0085                      
+  5.    1.1993   36.6769   0.0327                      
+  6.    9.7933  233.7783   0.0419                      
+  7.  103.1280 3741.4903   0.0276                      
+  8.    4.0753  106.4450   0.0383                      
+  9.   -2.1999    4.2216  -0.5211     (fixed parameter)
+ 10. -584.8394   59.0648  -9.9017     (fixed parameter)
+ 11. -170.4767  129.7204  -1.3142     (fixed parameter)
+ 12.  -79.9730   30.6494  -2.6093     (fixed parameter)
+ 13.   45.9931   24.2562   1.8961     (fixed parameter)
+
+Good convergence is indicated by the t-ratios of non-fixed parameters being close to zero.
+
+Overall maximum convergence ratio =  0.0682 .
+
+
+
+@2
+Estimation Results.
+-------------------
+
+Regular end of estimation algorithm.
+Total of 3889 iteration steps.
+
+
+@3
+Estimates and standard errors
+                             
+ 1. rate:  constant net rate (period 1)                            0.7228  (   0.0410)
+ 2. rate:  constant net rate (period 2)                            0.7356  (   0.0370)
+ 3. rate:  constant net rate (period 3)                            0.7004  (   0.0355)
+ 4. rate:  effect devActLogVar on rate                             0.0970  (   0.0169)
+ 5. eval:  outdegree (density)                                    -5.2697  (   0.1421)
+ 6. eval:  4-cycles (1)                                            0.5000  (   0.3842)
+ 7. eval:  indegree - popularity                                   0.0514  (   0.0033)
+ 8. eval:  outdegree - activity                                    0.2702  (   0.0382)
+ 9. eval:  licenseVar alter                                        0.0000  (  fixed  )
+10. eval:  devActLogVar ego                                        0.0000  (  fixed  )
+11. eval:  comIntLogVar alter                                      0.0000  (  fixed  )
+12. eval:  relActLogVar alter                                      0.0000  (  fixed  )
+13. eval:  ageLogVar alter                                         0.0000  (  fixed  )
+
+
+@3
+Covariance matrices
+                   
+(Values of the covariance matrix of estimates
+  are meaningless for the fixed parameters.)
+
+Covariance matrix of estimates (correlations below diagonal):
+     0.002      0.000      0.000      0.000      0.000     -0.001      0.000      0.000         NA         NA         NA         NA         NA
+     0.101      0.001      0.000      0.000     -0.001      0.000      0.000      0.000         NA         NA         NA         NA         NA
+     0.125      0.147      0.001      0.000     -0.001      0.001      0.000      0.000         NA         NA         NA         NA         NA
+    -0.329     -0.344     -0.327      0.000      0.000      0.000      0.000      0.000         NA         NA         NA         NA         NA
+    -0.043     -0.142     -0.157      0.097      0.020      0.001      0.000     -0.004         NA         NA         NA         NA         NA
+    -0.037      0.003      0.055      0.056      0.018      0.148      0.000     -0.007         NA         NA         NA         NA         NA
+     0.034      0.116      0.092     -0.048     -0.571     -0.056      0.000      0.000         NA         NA         NA         NA         NA
+     0.051      0.087      0.099     -0.093     -0.698     -0.444      0.203      0.001         NA         NA         NA         NA         NA
+        NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA
+        NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA
+        NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA
+        NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA
+        NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA
+
+Derivative matrix of expected statistics X by parameters and
+covariance/correlation matrix of X can be found using
+summary(ans) within R, or by using the 'verbose' option in Siena07.
+ 
+
+@2
+Generalised score test <c>
+--------------------------
+
+Testing the goodness-of-fit of the model restricted by
+ (1)   eval:  licenseVar alter                            =   0.0000
+ (2)   eval:  devActLogVar ego                            =   0.0000
+ (3)   eval:  comIntLogVar alter                          =   0.0000
+ (4)   eval:  relActLogVar alter                          =   0.0000
+ (5)   eval:  ageLogVar alter                             =   0.0000
+_________________________________________________
+                   
+Joint test:
+-----------
+   c = 198.9834   d.f. = 5   p-value < 0.0001
+
+(1) tested separately:
+-----------------------
+ - two-sided:
+  c =   0.2648   d.f. = 1  p-value =   0.6068
+ - one-sided (normal variate):   0.5146
+
+(2) tested separately:
+-----------------------
+ - two-sided:
+  c = 163.8353   d.f. = 1  p-value < 0.0001
+ - one-sided (normal variate):  12.7998
+
+(3) tested separately:
+-----------------------
+ - two-sided:
+  c =  11.6687   d.f. = 1  p-value =   0.0006
+ - one-sided (normal variate):   3.4159
+
+(4) tested separately:
+-----------------------
+ - two-sided:
+  c =   8.9072   d.f. = 1  p-value =   0.0028
+ - one-sided (normal variate):   2.9845
+
+(5) tested separately:
+-----------------------
+ - two-sided:
+  c =   4.3103   d.f. = 1  p-value =   0.0379
+ - one-sided (normal variate):  -2.0761    
+_________________________________________________
+
+One-step estimates: 
+
+rate:  constant net rate (period 1)                 0.7610
+rate:  constant net rate (period 2)                 0.7936
+rate:  constant net rate (period 3)                 0.7951
+rate:  effect devActLogVar on rate                  0.0370
+eval:  outdegree (density)                         -5.2642
+eval:  4-cycles (1)                                 0.5111
+eval:  indegree - popularity                        0.0401
+eval:  outdegree - activity                         0.0138
+eval:  licenseVar alter                             0.1765
+eval:  devActLogVar ego                             0.6418
+eval:  comIntLogVar alter                           0.2019
+eval:  relActLogVar alter                           0.1480
+eval:  ageLogVar alter                             -0.2570
+
+Total computation time 215.28 seconds.
+
+
+-----------------------------------
+New Analysis started.
+Date and time: 03/06/2022 19:25:20
+New results follow.
+-----------------------------------
+
+RSiena version 1.3.0.1 (02 Mai 21)
+
+
+@1
+Estimation by stochastic approximation algorithm.
+=================================================
+
+Current random number seed is 17.
+Effects object used: effects2 
+
+NB. Request for conditional estimation has been over-ridden.
+
+Estimation method: unconditional moment estimation
+.
+
+Time duration for simulations in each period is 1.0.
+Changing composition.
+Joiners/leavers option: 1
+Standard errors are estimated with the likelihood ratio method.
+Dolby method (regression on scores) is used.
+Initial value of gain parameter is  0.6928203.
+Reduction factor for gain parameter is  0.5000000.
+Number of subphases in Phase 2 is 4.
+
+Initial parameter values are 
+  1. rate:  constant net rate (period 1)                    1.3198
+  2. rate:  constant net rate (period 2)                    1.1534
+  3. rate:  constant net rate (period 3)                    1.0095
+  4. rate:  effect devActLogVar on rate                     0.0000
+  5. eval:  outdegree (density)                            -1.5450
+  6. eval:  4-cycles (1)                                    0.0000
+  7. eval:  indegree - popularity                           0.0000
+  8. eval:  outdegree - activity                            0.0000
+  9. eval:  licenseVar alter                                0.0000
+ 10. eval:  devActLogVar ego                                0.0000
+ 11. eval:  comIntLogVar alter                              0.0000
+ 12. eval:  relActLogVar alter                              0.0000
+ 13. eval:  ageLogVar alter                                 0.0000
+
+
+Observed values of target statistics are
+  1. Amount of network change in period 1                               413.0000
+  2. Amount of network change in period 2                               512.0000
+  3. Amount of network change in period 3                               540.0000
+  4. Amount of change x devActLogVar                                   1347.7839
+  5. Number of ties                                                    1754.0000
+  6. (Number 4-cycles)^1/1)                                              84.0000
+  7. Sum of squared indegrees                                          20874.0000
+  8. Sum of squared outdegrees                                         2908.0000
+  9. Sum of indegrees x licenseVar                                       -6.2097
+ 10. Sum of outdegrees x devActLogVar                                  2419.3892
+ 11. Sum of indegrees x comIntLogVar                                   2516.7282
+ 12. Sum of indegrees x relActLogVar                                    685.1799
+ 13. Sum of indegrees x ageLogVar                                        58.9602
+
+ 13 parameters, 13 statistics
+
+Estimation of derivatives by the LR method (type 1).
+
+
+@2
+End of stochastic approximation algorithm, phase 3.
+---------------------------------------------------
+
+Total of 4166 iterations.
+Parameter estimates based on 1166 iterations,
+convergence diagnostics, covariance and derivative matrices based on 3000 iterations.
+
+Information for convergence diagnosis.
+Averages, standard deviations, and t-ratios for deviations from targets:
+  1.   0.0573   17.4785   0.0033 
+  2.  -0.3403   19.9004  -0.0171 
+  3.   1.6210   20.1363   0.0805 
+  4.   1.3492   66.2774   0.0204 
+  5.   0.5067   35.6359   0.0142 
+  6.   3.7747  174.7423   0.0216 
+  7.  62.2640 2754.1713   0.0226 
+  8.   0.5307   94.3174   0.0056 
+  9.  -0.0844    4.3821  -0.0193 
+ 10.  -0.5881   66.8807  -0.0088 
+ 11.   0.7570  112.2453   0.0067 
+ 12.  -0.7839   31.4152  -0.0250 
+ 13.  -0.1192   24.5319  -0.0049 
+
+Good convergence is indicated by the t-ratios being close to zero.
+
+Overall maximum convergence ratio =  0.1011 .
+
+
+
+@2
+Estimation Results.
+-------------------
+
+Regular end of estimation algorithm.
+Total of 4166 iteration steps.
+
+
+@3
+Estimates and standard errors
+                             
+ 1. rate:  constant net rate (period 1)                            0.7702  (   0.0429)
+ 2. rate:  constant net rate (period 2)                            0.8103  (   0.0427)
+ 3. rate:  constant net rate (period 3)                            0.7978  (   0.0414)
+ 4. rate:  effect devActLogVar on rate                             0.0459  (   0.0182)
+ 5. eval:  outdegree (density)                                    -5.4791  (   0.1238)
+ 6. eval:  4-cycles (1)                                            0.5375  (   0.2470)
+ 7. eval:  indegree - popularity                                   0.0420  (   0.0048)
+ 8. eval:  outdegree - activity                                    0.0477  (   0.0351)
+ 9. eval:  licenseVar alter                                        0.3139  (   0.3329)
+10. eval:  devActLogVar ego                                        0.4882  (   0.0361)
+11. eval:  comIntLogVar alter                                      0.1922  (   0.0424)
+12. eval:  relActLogVar alter                                      0.1217  (   0.0764)
+13. eval:  ageLogVar alter                                        -0.1809  (   0.0771)
+
+
+@3
+Covariance matrices
+                   
+Covariance matrix of estimates (correlations below diagonal):
+     0.002      0.000      0.000      0.000      0.000      0.001      0.000      0.000      0.000      0.000      0.000      0.000      0.000
+     0.139      0.002      0.000      0.000      0.000      0.001      0.000      0.000      0.000      0.000      0.000      0.000      0.000
+     0.116      0.093      0.002      0.000     -0.001      0.000      0.000      0.000      0.000      0.000      0.000      0.000      0.000
+    -0.346     -0.373     -0.345      0.000      0.000      0.000      0.000      0.000      0.000      0.000      0.000      0.000      0.000
+    -0.048     -0.084     -0.202      0.205      0.015      0.002      0.000     -0.002     -0.001     -0.001     -0.001     -0.001      0.001
+     0.079      0.109      0.012     -0.063      0.053      0.061      0.000     -0.003     -0.003      0.001     -0.001     -0.002      0.000
+     0.014      0.044      0.080     -0.094     -0.283     -0.052      0.000      0.000      0.000      0.000      0.000      0.000      0.000
+    -0.054     -0.054     -0.009     -0.001     -0.457     -0.335     -0.043      0.001      0.001     -0.001      0.000      0.000      0.000
+     0.020     -0.004     -0.010      0.030     -0.017     -0.033     -0.096      0.051      0.111     -0.001      0.002      0.002      0.000
+     0.072      0.124      0.155     -0.136     -0.218      0.098      0.168     -0.547     -0.048      0.001      0.000      0.000      0.000
+     0.046     -0.008      0.010     -0.026     -0.138     -0.134     -0.640      0.134      0.133     -0.065      0.002      0.000     -0.001
+    -0.039     -0.065     -0.022      0.077     -0.056     -0.126     -0.174      0.067      0.093     -0.126     -0.076      0.006      0.002
+    -0.052     -0.023     -0.012      0.050      0.106      0.000     -0.008     -0.049      0.019      0.013     -0.318      0.316      0.006
+
+Derivative matrix of expected statistics X by parameters and
+covariance/correlation matrix of X can be found using
+summary(ans) within R, or by using the 'verbose' option in Siena07.
+ 
+Total computation time 276.24 seconds.
+
+
+-----------------------------------
+New Analysis started.
+Date and time: 03/06/2022 19:29:59
+New results follow.
+-----------------------------------
+
+RSiena version 1.3.0.1 (02 Mai 21)
+
+
+@1
+Estimation by stochastic approximation algorithm.
+=================================================
+
+Current random number seed is 17.
+Effects object used: effects3 
+
+NB. Request for conditional estimation has been over-ridden.
+
+Estimation method: unconditional moment estimation
+.
+
+Time duration for simulations in each period is 1.0.
+Changing composition.
+Joiners/leavers option: 1
+Standard errors are estimated with the likelihood ratio method.
+Dolby method (regression on scores) is used.
+Initial value of gain parameter is  0.6928203.
+Reduction factor for gain parameter is  0.5000000.
+Number of subphases in Phase 2 is 4.
+
+Initial parameter values are 
+  1. rate:  constant net rate (period 1)                    1.3198
+  2. rate:  constant net rate (period 2)                    1.1534
+  3. rate:  constant net rate (period 3)                    1.0095
+  4. rate:  effect devActLogVar on rate                     0.0000
+  5. eval:  outdegree (density)                            -1.5450
+  6. eval:  4-cycles (1)                                    0.0000
+  7. eval:  indegree - popularity                           0.0000
+  8. eval:  outdegree - activity                            0.0000
+  9. eval:  depUpDyad                                       0.0000  (fixed) 
+ 10. eval:  depDownDyad                                     0.0000  (fixed) 
+ 11. eval:  licenseVar alter                                0.0000
+ 12. eval:  devActLogVar ego                                0.0000
+ 13. eval:  comIntLogVar alter                              0.0000
+ 14. eval:  relActLogVar alter                              0.0000
+ 15. eval:  ageLogVar alter                                 0.0000
+ 16. eval:  depsUpLogVar alter                              0.0000  (fixed) 
+ 17. eval:  depsDownLogVar alter                            0.0000  (fixed) 
+
+
+Observed values of target statistics are
+  1. Amount of network change in period 1                               413.0000
+  2. Amount of network change in period 2                               512.0000
+  3. Amount of network change in period 3                               540.0000
+  4. Amount of change x devActLogVar                                   1347.7839
+  5. Number of ties                                                    1754.0000
+  6. (Number 4-cycles)^1/1)                                              84.0000
+  7. Sum of squared indegrees                                          20874.0000
+  8. Sum of squared outdegrees                                         2908.0000
+  9. Sum of ties x depUpDyad                                             65.8404
+ 10. Sum of ties x depDownDyad                                           99.7346
+ 11. Sum of indegrees x licenseVar                                       -6.2097
+ 12. Sum of outdegrees x devActLogVar                                  2419.3892
+ 13. Sum of indegrees x comIntLogVar                                   2516.7282
+ 14. Sum of indegrees x relActLogVar                                    685.1799
+ 15. Sum of indegrees x ageLogVar                                        58.9602
+ 16. Sum of indegrees x depsUpLogVar                                    335.6224
+ 17. Sum of indegrees x depsDownLogVar                                  -54.7451
+
+ 17 parameters, 17 statistics
+
+Estimation of derivatives by the LR method (type 1).
+
+
+@2
+End of stochastic approximation algorithm, phase 3.
+---------------------------------------------------
+
+Total of 4166 iterations.
+Parameter estimates based on 1166 iterations,
+convergence diagnostics, covariance and derivative matrices based on 3000 iterations.
+
+Information for convergence diagnosis.
+Averages, standard deviations, and t-ratios for deviations from targets:
+  1.   0.0573   17.4785   0.0033                      
+  2.  -0.3403   19.9004  -0.0171                      
+  3.   1.6210   20.1363   0.0805                      
+  4.   1.3492   66.2774   0.0204                      
+  5.   0.5067   35.6359   0.0142                      
+  6.   3.7747  174.7423   0.0216                      
+  7.  62.2640 2754.1713   0.0226                      
+  8.   0.5307   94.3174   0.0056                      
+  9. -12.5200    4.0661  -3.0791     (fixed parameter)
+ 10. -14.6224    5.4848  -2.6660     (fixed parameter)
+ 11.  -0.0844    4.3821  -0.0193                      
+ 12.  -0.5881   66.8807  -0.0088                      
+ 13.   0.7570  112.2453   0.0067                      
+ 14.  -0.7839   31.4152  -0.0250                      
+ 15.  -0.1192   24.5319  -0.0049                      
+ 16. -46.4271   43.3395  -1.0712     (fixed parameter)
+ 17. -43.4404   34.7607  -1.2497     (fixed parameter)
+
+Good convergence is indicated by the t-ratios of non-fixed parameters being close to zero.
+
+Overall maximum convergence ratio =  0.1011 .
+
+
+
+@2
+Estimation Results.
+-------------------
+
+Regular end of estimation algorithm.
+Total of 4166 iteration steps.
+
+
+@3
+Estimates and standard errors
+                             
+ 1. rate:  constant net rate (period 1)                            0.7702  (   0.0429)
+ 2. rate:  constant net rate (period 2)                            0.8103  (   0.0427)
+ 3. rate:  constant net rate (period 3)                            0.7978  (   0.0414)
+ 4. rate:  effect devActLogVar on rate                             0.0459  (   0.0182)
+ 5. eval:  outdegree (density)                                    -5.4791  (   0.1238)
+ 6. eval:  4-cycles (1)                                            0.5375  (   0.2470)
+ 7. eval:  indegree - popularity                                   0.0420  (   0.0048)
+ 8. eval:  outdegree - activity                                    0.0477  (   0.0351)
+ 9. eval:  depUpDyad                                               0.0000  (  fixed  )
+10. eval:  depDownDyad                                             0.0000  (  fixed  )
+11. eval:  licenseVar alter                                        0.3139  (   0.3329)
+12. eval:  devActLogVar ego                                        0.4882  (   0.0361)
+13. eval:  comIntLogVar alter                                      0.1922  (   0.0424)
+14. eval:  relActLogVar alter                                      0.1217  (   0.0764)
+15. eval:  ageLogVar alter                                        -0.1809  (   0.0771)
+16. eval:  depsUpLogVar alter                                      0.0000  (  fixed  )
+17. eval:  depsDownLogVar alter                                    0.0000  (  fixed  )
+
+
+@3
+Covariance matrices
+                   
+(Values of the covariance matrix of estimates
+  are meaningless for the fixed parameters.)
+
+Covariance matrix of estimates (correlations below diagonal):
+     0.002      0.000      0.000      0.000      0.000      0.001      0.000      0.000         NA         NA      0.000      0.000      0.000      0.000      0.000         NA         NA
+     0.139      0.002      0.000      0.000      0.000      0.001      0.000      0.000         NA         NA      0.000      0.000      0.000      0.000      0.000         NA         NA
+     0.116      0.093      0.002      0.000     -0.001      0.000      0.000      0.000         NA         NA      0.000      0.000      0.000      0.000      0.000         NA         NA
+    -0.346     -0.373     -0.345      0.000      0.000      0.000      0.000      0.000         NA         NA      0.000      0.000      0.000      0.000      0.000         NA         NA
+    -0.048     -0.084     -0.202      0.205      0.015      0.002      0.000     -0.002         NA         NA     -0.001     -0.001     -0.001     -0.001      0.001         NA         NA
+     0.079      0.109      0.012     -0.063      0.053      0.061      0.000     -0.003         NA         NA     -0.003      0.001     -0.001     -0.002      0.000         NA         NA
+     0.014      0.044      0.080     -0.094     -0.283     -0.052      0.000      0.000         NA         NA      0.000      0.000      0.000      0.000      0.000         NA         NA
+    -0.054     -0.054     -0.009     -0.001     -0.457     -0.335     -0.043      0.001         NA         NA      0.001     -0.001      0.000      0.000      0.000         NA         NA
+        NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA
+        NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA
+     0.020     -0.004     -0.010      0.030     -0.017     -0.033     -0.096      0.051         NA         NA      0.111     -0.001      0.002      0.002      0.000         NA         NA
+     0.072      0.124      0.155     -0.136     -0.218      0.098      0.168     -0.547         NA         NA     -0.048      0.001      0.000      0.000      0.000         NA         NA
+     0.046     -0.008      0.010     -0.026     -0.138     -0.134     -0.640      0.134         NA         NA      0.133     -0.065      0.002      0.000     -0.001         NA         NA
+    -0.039     -0.065     -0.022      0.077     -0.056     -0.126     -0.174      0.067         NA         NA      0.093     -0.126     -0.076      0.006      0.002         NA         NA
+    -0.052     -0.023     -0.012      0.050      0.106      0.000     -0.008     -0.049         NA         NA      0.019      0.013     -0.318      0.316      0.006         NA         NA
+        NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA
+        NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA         NA
+
+Derivative matrix of expected statistics X by parameters and
+covariance/correlation matrix of X can be found using
+summary(ans) within R, or by using the 'verbose' option in Siena07.
+ 
+
+@2
+Generalised score test <c>
+--------------------------
+
+Testing the goodness-of-fit of the model restricted by
+ (1)   eval:  depUpDyad                                   =   0.0000
+ (2)   eval:  depDownDyad                                 =   0.0000
+ (3)   eval:  depsUpLogVar alter                          =   0.0000
+ (4)   eval:  depsDownLogVar alter                        =   0.0000
+_________________________________________________
+                   
+Joint test:
+-----------
+   c =  19.1970   d.f. = 4   p-value =   0.0007
+
+(1) tested separately:
+-----------------------
+ - two-sided:
+  c =  10.2228   d.f. = 1  p-value =   0.0014
+ - one-sided (normal variate):   3.1973
+
+(2) tested separately:
+-----------------------
+ - two-sided:
+  c =   8.2635   d.f. = 1  p-value =   0.0040
+ - one-sided (normal variate):   2.8746
+
+(3) tested separately:
+-----------------------
+ - two-sided:
+  c =   1.2471   d.f. = 1  p-value =   0.2641
+ - one-sided (normal variate):   1.1167
+
+(4) tested separately:
+-----------------------
+ - two-sided:
+  c =   1.9458   d.f. = 1  p-value =   0.1630
+ - one-sided (normal variate):   1.3949    
+_________________________________________________
+
+One-step estimates: 
+
+rate:  constant net rate (period 1)                 0.7762
+rate:  constant net rate (period 2)                 0.8097
+rate:  constant net rate (period 3)                 0.7938
+rate:  effect devActLogVar on rate                  0.0552
+eval:  outdegree (density)                         -5.4845
+eval:  4-cycles (1)                                 0.5123
+eval:  indegree - popularity                        0.0434
+eval:  outdegree - activity                         0.0288
+eval:  depUpDyad                                    1.9699
+eval:  depDownDyad                                  1.4491
+eval:  licenseVar alter                             0.3671
+eval:  devActLogVar ego                             0.4657
+eval:  comIntLogVar alter                           0.2007
+eval:  relActLogVar alter                           0.1266
+eval:  ageLogVar alter                             -0.1964
+eval:  depsUpLogVar alter                           0.0562
+eval:  depsDownLogVar alter                         0.0843
+
+Total computation time 314.1 seconds.
+
+
+-----------------------------------
+New Analysis started.
+Date and time: 03/06/2022 19:35:16
+New results follow.
+-----------------------------------
+
+RSiena version 1.3.0.1 (02 Mai 21)
+
+
+@1
+Estimation by stochastic approximation algorithm.
+=================================================
+
+Current random number seed is 17.
+Effects object used: effects3 
+
+NB. Request for conditional estimation has been over-ridden.
+
+Estimation method: unconditional moment estimation
+.
+
+Time duration for simulations in each period is 1.0.
+Changing composition.
+Joiners/leavers option: 1
+Standard errors are estimated with the likelihood ratio method.
+Dolby method (regression on scores) is used.
+Initial value of gain parameter is  0.6928203.
+Reduction factor for gain parameter is  0.5000000.
+Number of subphases in Phase 2 is 4.
+
+Initial parameter values are 
+  1. rate:  constant net rate (period 1)                    1.3198
+  2. rate:  constant net rate (period 2)                    1.1534
+  3. rate:  constant net rate (period 3)                    1.0095
+  4. rate:  effect devActLogVar on rate                     0.0000
+  5. eval:  outdegree (density)                            -1.5450
+  6. eval:  4-cycles (1)                                    0.0000
+  7. eval:  indegree - popularity                           0.0000
+  8. eval:  outdegree - activity                            0.0000
+  9. eval:  depUpDyad                                       0.0000
+ 10. eval:  depDownDyad                                     0.0000
+ 11. eval:  licenseVar alter                                0.0000
+ 12. eval:  devActLogVar ego                                0.0000
+ 13. eval:  comIntLogVar alter                              0.0000
+ 14. eval:  relActLogVar alter                              0.0000
+ 15. eval:  ageLogVar alter                                 0.0000
+ 16. eval:  depsUpLogVar alter                              0.0000
+ 17. eval:  depsDownLogVar alter                            0.0000
+
+
+Observed values of target statistics are
+  1. Amount of network change in period 1                               413.0000
+  2. Amount of network change in period 2                               512.0000
+  3. Amount of network change in period 3                               540.0000
+  4. Amount of change x devActLogVar                                   1347.7839
+  5. Number of ties                                                    1754.0000
+  6. (Number 4-cycles)^1/1)                                              84.0000
+  7. Sum of squared indegrees                                          20874.0000
+  8. Sum of squared outdegrees                                         2908.0000
+  9. Sum of ties x depUpDyad                                             65.8404
+ 10. Sum of ties x depDownDyad                                           99.7346
+ 11. Sum of indegrees x licenseVar                                       -6.2097
+ 12. Sum of outdegrees x devActLogVar                                  2419.3892
+ 13. Sum of indegrees x comIntLogVar                                   2516.7282
+ 14. Sum of indegrees x relActLogVar                                    685.1799
+ 15. Sum of indegrees x ageLogVar                                        58.9602
+ 16. Sum of indegrees x depsUpLogVar                                    335.6224
+ 17. Sum of indegrees x depsDownLogVar                                  -54.7451
+
+ 17 parameters, 17 statistics
+
+Estimation of derivatives by the LR method (type 1).
+
+
+@2
+End of stochastic approximation algorithm, phase 3.
+---------------------------------------------------
+
+Total of 4166 iterations.
+Parameter estimates based on 1166 iterations,
+convergence diagnostics, covariance and derivative matrices based on 3000 iterations.
+
+Information for convergence diagnosis.
+Averages, standard deviations, and t-ratios for deviations from targets:
+  1.   0.8307   17.2367   0.0482 
+  2.  -0.2513   19.6101  -0.0128 
+  3.   0.5070   20.1782   0.0251 
+  4.   0.1668   66.5849   0.0025 
+  5.  -1.0590   35.2074  -0.0301 
+  6.   1.5633  162.6737   0.0096 
+  7. -21.8137 2692.7962  -0.0081 
+  8.   0.4023   91.9400   0.0044 
+  9.  -0.0882    3.0135  -0.0293 
+ 10.  -0.1352    4.7705  -0.0283 
+ 11.   0.0596    4.3722   0.0136 
+ 12.   1.8998   65.1510   0.0292 
+ 13.  -1.9566  111.2193  -0.0176 
+ 14.  -0.0350   32.2179  -0.0011 
+ 15.   0.3453   24.7631   0.0139 
+ 16.   0.7581   44.8697   0.0169 
+ 17.   0.0764   37.0256   0.0021 
+
+Good convergence is indicated by the t-ratios being close to zero.
+
+Overall maximum convergence ratio =  0.1103 .
+
+
+
+@2
+Estimation Results.
+-------------------
+
+Regular end of estimation algorithm.
+Total of 4166 iteration steps.
+
+
+@3
+Estimates and standard errors
+                             
+ 1. rate:  constant net rate (period 1)                            0.7731  (   0.0435)
+ 2. rate:  constant net rate (period 2)                            0.8128  (   0.0428)
+ 3. rate:  constant net rate (period 3)                            0.7992  (   0.0419)
+ 4. rate:  effect devActLogVar on rate                             0.0523  (   0.0187)
+ 5. eval:  outdegree (density)                                    -5.5186  (   0.1260)
+ 6. eval:  4-cycles (1)                                            0.5172  (   0.2941)
+ 7. eval:  indegree - popularity                                   0.0436  (   0.0052)
+ 8. eval:  outdegree - activity                                    0.0391  (   0.0360)
+ 9. eval:  depUpDyad                                               1.9337  (   0.5557)
+10. eval:  depDownDyad                                             1.3378  (   0.4592)
+11. eval:  licenseVar alter                                        0.3063  (   0.3312)
+12. eval:  devActLogVar ego                                        0.4651  (   0.0369)
+13. eval:  comIntLogVar alter                                      0.2032  (   0.0452)
+14. eval:  relActLogVar alter                                      0.1270  (   0.0765)
+15. eval:  ageLogVar alter                                        -0.2017  (   0.0780)
+16. eval:  depsUpLogVar alter                                      0.0487  (   0.0487)
+17. eval:  depsDownLogVar alter                                    0.0792  (   0.0564)
+
+
+@3
+Covariance matrices
+                   
+Covariance matrix of estimates (correlations below diagonal):
+     0.002      0.000      0.000      0.000     -0.001      0.000      0.000      0.000      0.001      0.000      0.000      0.000      0.000      0.000      0.000      0.000      0.000
+     0.135      0.002      0.000      0.000     -0.001      0.001      0.000      0.000      0.002      0.000      0.000      0.000      0.000      0.000      0.000      0.000      0.000
+     0.087      0.115      0.002      0.000     -0.001      0.001      0.000      0.000      0.002      0.000      0.000      0.000      0.000      0.000      0.000      0.000      0.000
+    -0.342     -0.365     -0.347      0.000      0.001      0.000      0.000      0.000      0.000      0.000      0.000      0.000      0.000      0.000      0.000      0.000      0.000
+    -0.111     -0.117     -0.161      0.217      0.016      0.002      0.000     -0.002     -0.008     -0.006     -0.001     -0.001     -0.001     -0.001      0.001      0.000      0.000
+    -0.002      0.055      0.093     -0.071      0.064      0.086      0.000     -0.004      0.002     -0.013     -0.002      0.001     -0.004     -0.004      0.000     -0.002      0.001
+     0.090      0.085      0.087     -0.122     -0.290      0.165      0.000      0.000      0.000      0.000      0.000      0.000      0.000      0.000      0.000      0.000      0.000
+     0.037     -0.048     -0.037     -0.016     -0.452     -0.390     -0.080      0.001      0.001      0.000      0.000     -0.001      0.000      0.000      0.000      0.000      0.000
+     0.027      0.065      0.094      0.012     -0.117      0.010      0.076      0.027      0.309     -0.012      0.000     -0.001     -0.002      0.002      0.001      0.000      0.001
+    -0.002      0.022      0.005      0.025     -0.112     -0.095     -0.070      0.017     -0.046      0.211      0.002     -0.002      0.003      0.004      0.001      0.001      0.000
+    -0.020      0.006      0.030     -0.010     -0.021     -0.017     -0.050     -0.001      0.001      0.015      0.110      0.000      0.002      0.001      0.000     -0.002      0.000
+     0.069      0.138      0.155     -0.147     -0.192      0.065      0.138     -0.530     -0.041     -0.121     -0.006      0.001      0.000      0.000      0.000      0.000      0.000
+    -0.028     -0.037     -0.019     -0.006     -0.124     -0.271     -0.689      0.162     -0.063      0.144      0.119     -0.071      0.002      0.000     -0.001      0.000      0.000
+    -0.006     -0.063     -0.029      0.064     -0.121     -0.182     -0.183      0.114      0.039      0.104      0.045     -0.071     -0.035      0.006      0.002      0.000      0.001
+    -0.015     -0.056     -0.006      0.054      0.110      0.003     -0.078     -0.027      0.012      0.031     -0.009     -0.004     -0.215      0.302      0.006      0.000      0.000
+     0.005      0.020     -0.031     -0.018     -0.075     -0.107      0.040      0.058     -0.014      0.035     -0.102     -0.051      0.019     -0.041     -0.101      0.002      0.000
+    -0.011     -0.015      0.041      0.007     -0.062      0.050      0.111     -0.016      0.028     -0.016      0.024     -0.039     -0.008      0.133     -0.092     -0.157      0.003
+
+Derivative matrix of expected statistics X by parameters and
+covariance/correlation matrix of X can be found using
+summary(ans) within R, or by using the 'verbose' option in Siena07.
+ 
+Total computation time 313.75 seconds.

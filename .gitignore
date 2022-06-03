@@ -47,5 +47,8 @@ data/lists
 # Tutorial
 tutorial/
 
+# Archive
+_archive/
+
 # macOS
 .DS_Store

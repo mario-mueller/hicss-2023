@@ -1,17 +1,16 @@
 ---
 title: "The Role of Dependency Networks in Developer Participation Decisions in Open Source Software Ecosystems: An Application of Stochastic-Actor Oriented Models"
-
-abstract: |
-  Open source software relies on the contributions of developers who voluntarily participate in the project. While prior research has investigated social characteristics, relations, and connections that influence a developer's participation, we argue that the technical relations and connections of projects, which emerge through dependencies between packages in software ecosystems, play a focal role in that decision as well. We empirically test these assertions by applying stochastic-actor oriented models to an affiliation network in the JavaScript software ecosystem. Our results show that while the number of dependencies of a project does not influence participation, developers are more likely to participate in projects to which their own projects have dependency relations. This study thereby contributes to the understanding of driving antecedents of developer\'s participation decisions by highlighting the importance of project interdependencies in software ecosystems.
-
-keywords: "Open Source Software Participation, Software Ecosystems, Longitudinal Network Analysis, Dynamic Network Evolution, Affiliation Networks"
-
-bibliography: /Users/mariomueller/Workspace/hicss-2023/references.bib
 ---
 
-# Introduction
+**Abstract**
 
-Unlike software development in organizations, *open source software (OSS)* projects are usually undertaken by a decentralized community of developers who collaborate via development platforms to produce the software [@Fang2009; @Lindberg2016]. Often, these developers are not paid [@Crowston2011; @Roberts2006], although a fraction is employed by companies specifically to help in OSS development [@vonKrogh2012]. Thereby, OSS projects depend on the continuous, voluntary participation of distributed developers [@Mockus2002; @Roberts2006].
+*Open source software relies on the contributions of developers who voluntarily participate in the project. While prior research has investigated social characteristics, relations, and connections that influence a developer's participation, we argue that the technical relations and connections of projects, which emerge through dependencies between packages in software ecosystems, play a focal role in that decision as well. We empirically test these assertions by applying stochastic-actor oriented models to an affiliation network in the JavaScript software ecosystem. Our results show that while the number of dependencies of a project does not influence participation, developers are more likely to participate in projects to which their own projects have dependency relations. This study thereby contributes to the understanding of driving antecedents of developer\'s participation decisions by highlighting the importance of project interdependencies in software ecosystems.*
+
+**Keywords:** Open Source Software Participation, Software Ecosystems, Longitudinal Network Analysis, Dynamic Network Evolution, Affiliation Networks.
+
+# 1. Introduction
+
+Unlike software development in organizations, *open source software (OSS)* projects are usually undertaken by a decentralized community of developers who collaborate via development platforms to produce the software (Fang & Neufeld, 2009; Lindberg et al., 2016). Often, these developers are not paid (Crowston, 2011; Roberts et al., 2006), although a fraction is employed by companies specifically to help in OSS development (von Krogh et al., 2012). Thereby, OSS projects depend on the continuous, voluntary participation of distributed developers (Mockus et al., 2002; Roberts et al., 2006).
 
 Previous research has therefore investigated what factors influence a developer's decision to participate in a project. In doing so, studies have focused on individual-related factors that lead to intrinsic and extrinsic motivations (von Krogh et al., 2012), as well as project-related factors, such as organizational sponsorship or license restrictions (Stewart et al., 2006). Researchers also have taken the social structure of projects and their community into account by applying techniques from social network analysis (e.g., Grewal et al., 2006; Hahn et al., 2008; Oh & Jeon, 2007).
 
@@ -23,9 +22,9 @@ The aim of this study is to empirically test these assertions. To do so, we theo
 
 The remainder of this paper is structured as follows. In Section 2, we provide an overview of related work on developer participation and dependency networks in OSS ecosystems, and we develop our hypotheses. In Section 3, we describe our data collection process and network construction, and give a brief overview about stochastic actor-oriented models. In Section 4, we report the results of our analysis. Finally, in Section 5, we discuss our results, implications, and limitations.
 
-# Theoretical Background
+# 2. Theoretical Background
 
-## Developer Participation in Open Source Software Projects
+## 2.1. Developer Participation in Open Source Software Projects
 
 OSS development is driven by a decentralized community of developers that mostly voluntarily contribute to projects and collaborate via online development platforms and management software such as GitHub (Fang & Neufeld, 2009; Roberts et al., 2006). OSS projects thereby rely on the continuous participation of their community members (Roberts et al., 2006; Shah, 2006) and need to attract and retain developers (Butler, 2001; Crowston et al., 2003) in order to stay viable. Therefore, the question of what motivates developers to participate in a particular OSS project has been central to OSS research (Roberts et al., 2006).
 
@@ -71,7 +70,7 @@ Based on the selected packages and identified developers, we constructed the aff
 
 We observed the affiliation network from February until May 2021. We opted for the four-month window to reduce time heterogeneity and keep the amount of change between periods at a sufficient level for analysis, which is also consistent with previous research (e.g., Hahn et al., 2008; Tang et al., 2020). Thereby, we created snapshots of the network state at the beginning of each month. This resulted in a total of four observations. Figure 1 shows the state of the affiliation network at the last observation point.
 
-![](media/image3.png){width="2.8415146544181975in" height="2.682292213473316in"}
+![](.//media/image3.png){width="2.8415146544181975in" height="2.682292213473316in"}
 
 **Figure 1. Affiliation network at observation *t*~4~ (developers as red circles; packages as blue squares).**
 
@@ -94,8 +93,6 @@ Finally, we included exogenous actor-specific receiver effects as well as dyadic
 Because the estimation operations of RSiena are not scale-independent, it is advised to scale covariates to achieve standard deviations between 0.1 and 10 (Ripley et al., 2022). Therefore, we log-transformed the values of our actor-specific covariates. Table 1 summarizes the relevant effects used in this study.
 
   -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  **Table 1. Summary of endogenous network effects and exogenous actor-specific covariates.**   
-  --------------------------------------------------------------------------------------------- -------------------------------------------------------------------------------------------------------------------------
   Parameter                                                                                     Description
 
   Outdegree (Density)                                                                           Tendency of developers to participate in packages.
@@ -125,6 +122,7 @@ Because the estimation operations of RSiena are not scale-independent, it is adv
   Participation in Downstream Dependency                                                        Tendency of developers to participate in a package if they also participate in a downstream dependency of that package.
   -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+: Summary of endogenous network effects and exogenous actor-specific covariates.
 # 4. Results
 
 First, Table 2 summarizes network descriptives. Over all periods, the network's density is relatively small. During all four periods, the network's density and the average degree declines. This is a result of the joining actors in periods 2 to 4. Therefore, the number of possible ties increases, but the number of ties that are actually established does not increase accordingly.
@@ -242,12 +240,12 @@ In this study, we developed and estimated a dynamic network model for the analys
 
 Our results show that developers not only contribute to packages they use themselves (*H2b*), but also to packages that make use of their own packages (*H2a*). This shows that projects benefit from their dependencies in both directions through contributions made by developers of interdependent projects. While previous research already mentioned need-driven motivation as one antecedent for participation (Shah, 2006), this empirically shows for the first time that users of a package do not free-ride but also contribute
 
-  ---------------------------------------------------------------------------------------------------------------------------------------------------------
-  ![](media/image2.png){width="3.29in" height="2.1796248906386704in"}                  ![](media/image1.png){width="3.29in" height="2.182366579177603in"}
-  ------------------------------------------------------------------------------------ --------------------------------------------------------------------
+  ------------------------------------------------------------------------------------------------------------------------------------------------------------
+  ![](.//media/image2.png){width="3.29in" height="2.1796248906386704in"}               ![](.//media/image1.png){width="3.29in" height="2.182366579177603in"}
+  ------------------------------------------------------------------------------------ -----------------------------------------------------------------------
   **Figure 2. Goodness of fit of Model 3 for indegree and outdegree distributions.**   
 
-  ---------------------------------------------------------------------------------------------------------------------------------------------------------
+  ------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 back. Moreover, our findings show that package providers contribute and provide help to their dependent packages. Even though we find that the likelihood of contribution increases, the actual type of the contribution remains an open question and provides opportunities for future research. However, the number of dependencies by themselves do not influence a developer's decision; a large number of up- or downstream dependencies does not equal more attractiveness, thus we did not find support for *H1a* and *H1b*.
 

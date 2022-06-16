@@ -26,3 +26,6 @@ pdf : $(SOURCE_DOC:.md=.pdf)
 
 clean:
 	- rm $(OUTPUT_DOCS)
+
+
+pandoc -s HICSS-2023-Submission.docx -t markdown+grid_tables --extract-media=./ --markdown-headings=atx --wrap=preserve -o manuscript.md

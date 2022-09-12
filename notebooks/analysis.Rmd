@@ -392,9 +392,20 @@ plot(gof.od2)
 ```{r}
 gof.id3 <- sienaGOF(ans.model3, varName="net", IndegreeDistribution,
                     join=T, cumulative=F, verbose=T)
-plot(gof.id3)
+saveRDS(gof.id3, "models/model3.gof.id.rds")
 
 gof.od3 <- sienaGOF(ans.model3, varName="net", OutdegreeDistribution,
                     join=T, cumulative=F, verbose=T)
-plot(gof.od3)
+saveRDS(gof.od3, "models/model3.gof.od.rds")
 ```
+
+## Plot GOF
+
+```{r}
+fig2a <- plot(gof.id3, main="Indegree Distribution",
+              center=T, scale=T, violin=T, fontsize=24)
+
+fig2b <- plot(gof.od3, main="Outdegree Distribution",
+              center=T, scale=T, violin=T, fontsize=24)
+```
+

@@ -16,7 +16,9 @@ library(network)
 library(sna)
 library(intergraph)
 library(RSiena)
-library(multiSiena)
+# library(multiSiena)
+library(ggplot2)
+library(cowplot)
 library(patchwork)
 library(texreg)
 # setwd("/Users/mariomueller/Workspace/hicss-2023")
@@ -407,5 +409,18 @@ fig2a <- plot(gof.id3, main="Indegree Distribution",
 
 fig2b <- plot(gof.od3, main="Outdegree Distribution",
               center=T, scale=T, violin=T, fontsize=24)
+```
+
+```{r}
+fig2a <- ggdraw() + draw_image("figures/figure2a.jpeg")
+fig2b <- ggdraw() + draw_image("figures/figure2b.jpeg")
+```
+
+```{r}
+fig2 <- fig2a + fig2b
+
+ggsave("figures/figure2.png",
+       fig2,
+       dpi = 600)
 ```
 

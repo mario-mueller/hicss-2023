@@ -1,7 +1,5 @@
 ---
-title: "RSiena Analysis"
-author: "Mario Mueller"
-date: "6/3/2022"
+title: "Data Analysis"
 output: html_document
 editor_options: 
   chunk_output_type: console
@@ -19,7 +17,6 @@ library(RSiena)
 library(multiSiena)
 library(patchwork)
 library(texreg)
-# setwd("/Users/mariomueller/Workspace/hicss-2023")
 ```
 
 # Data Preparation
@@ -392,20 +389,9 @@ plot(gof.od2)
 ```{r}
 gof.id3 <- sienaGOF(ans.model3, varName="net", IndegreeDistribution,
                     join=T, cumulative=F, verbose=T)
-saveRDS(gof.id3, "models/model3.gof.id.rds")
+plot(gof.id3)
 
 gof.od3 <- sienaGOF(ans.model3, varName="net", OutdegreeDistribution,
                     join=T, cumulative=F, verbose=T)
-saveRDS(gof.od3, "models/model3.gof.od.rds")
+plot(gof.od3)
 ```
-
-## Plot GOF
-
-```{r}
-fig2a <- plot(gof.id3, main="Indegree Distribution",
-              center=T, scale=T, violin=T, fontsize=24)
-
-fig2b <- plot(gof.od3, main="Outdegree Distribution",
-              center=T, scale=T, violin=T, fontsize=24)
-```
-

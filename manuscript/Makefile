@@ -1,11 +1,10 @@
-SOURCE_DIR  = 	manuscript
-SOURCE_DOC	=	$(SOURCE_DIR)/manuscript.md
+SOURCE_DOC	= manuscript.md
 
 OUTPUT_DOCS	=\
  	$(SOURCE_DOC:.md=.pdf) \
  	$(SOURCE_DOC:.md=.docx)
  
-REFERENCE_FILE = $(SOURCE_DIR)/references.bib
+REFERENCE_FILE = references.bib
 
 PANDOC_OPTIONS 		= 
 PANDOC_FILTERS		=	--citeproc

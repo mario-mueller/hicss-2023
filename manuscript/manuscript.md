@@ -15,14 +15,13 @@ margin-right: 1in
 margin-top: 1.25in
 margin-bottom: 1.25in
 
-mainfont: Palatino
-sansfont: Helvetica
+mainfont: Times New Roman
 fontsize: 11 pt
 
 reference-section-title: "References"
 link-citations: true
 csl: apa
-bibliography: /home/mmmmario/Dropbox/library/bib/library.bib
+bibliography: references.bib
 header-includes:
  - \usepackage[margins=centering]{floatrow}
 ---
@@ -89,7 +88,7 @@ Based on the selected packages and identified developers, we constructed the aff
 
 We observed the affiliation network from February until May 2021. We opted for the four-month window to reduce time heterogeneity and keep the amount of change between periods at a sufficient level for analysis, which is also consistent with previous research [e.g., @Hahn2008; @Tang2020]. Thereby, we created snapshots of the network state at the beginning of each month. This resulted in a total of four observations. Figure \ref{ch5_affiliation_network} shows the state of the affiliation network at the last observation point. The layout was generated using the Fruchterman-Reingold algorithm [@Fruchterman1991].
 
-![Affiliation network at observation t~4~ (developers as red circles; packages as blue squares).\label{ch5_affiliation_network}](figures/5-1-affiliation_network.png){width=5in}
+![Affiliation network at observation t~4~ (developers as red circles; packages as blue squares).\label{ch5_affiliation_network}](../figures/figure1.png){width=5in}
 
 ### Data Analysis
 
@@ -242,7 +241,7 @@ The simulation-based goodness-of-Fit (GOF) test for the estimated models tests t
 
 Figure \ref{ch5_gof} shows the results of the GOF tests for Model 3. Observed values are indicated by the number connected by the red line. The simulated statistics are represented by the violin plots. The dotted lines represent the 95th percentile bands. Wald-type tests and score-type tests for the joint significance of the added effects as reported in Table \ref{ch5_estimates} also indicate an improvement of model fit and strong significance of the added effects (p \< 0.001).
 
-![Goodness of fit of Model 3 for indegree and outdegree distributions.\label{ch5_gof}](figures/5-2-gof.png){width=6in}
+![Goodness of fit of Model 3 for indegree and outdegree distributions.\label{ch5_gof}](../figures/figure2.png){width=6in}
 
 ## Discussion
 
